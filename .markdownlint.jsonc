@@ -1,0 +1,8 @@
+{
+  // Long lines are expected in tables and link-heavy sections.
+  "MD013": false,
+  // Allow raw HTML (e.g. badges, <br>) if ever needed.
+  "MD033": false,
+  // Compact vs. padded table pipes is a style choice, not a rendering issue.
+  "MD060": false
+}

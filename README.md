@@ -1,4 +1,4 @@
-### Dusty
+# Dusty
 
 Open-source AWS cloud security tooling focused on **FedRAMP**, **NIST 800-53 Rev5**, multi-account governance, and practical day-to-day guardrails — including support for commercial and GovCloud partitions.
 
@@ -6,7 +6,7 @@ I build reusable CloudFormation & Terraform modules, auto-remediation patterns, 
 
 ---
 
-### The Suite
+## The Suite
 
 | Repository | Purpose |
 |------------|---------|
@@ -19,6 +19,7 @@ I build reusable CloudFormation & Terraform modules, auto-remediation patterns, 
 | [**ai-terraform-toolkit**](https://github.com/DustyStudy/ai-terraform-toolkit) | Security-hardened Terraform modules + Claude / Gemini AI workflows |
 
 All libraries emphasize:
+
 - FedRAMP-aligned controls and honest coverage-gap documentation
 - GovCloud / partition awareness
 - Short-lived credentials only (OIDC / SSO)
@@ -26,7 +27,8 @@ All libraries emphasize:
 
 ---
 
-### Focus areas
+## Focus areas
+
 - FedRAMP Moderate / High / 20x baselines
 - Multi-account AWS Organizations governance
 - AI/ML (Bedrock, SageMaker, agentic workloads) security
