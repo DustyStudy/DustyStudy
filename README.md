@@ -1,6 +1,6 @@
 # Dusty
 
-Open-source AWS cloud security tooling focused on **FedRAMP**, **NIST 800-53 Rev5**, multi-account governance, and practical day-to-day guardrails — including support for commercial and GovCloud partitions.
+Open-source AWS cloud security tooling focused on **FedRAMP**, **NIST 800-53 Rev5**, multi-account governance, and practical day-to-day guardrails — including support for commercial and GovCloud partitions, plus GRC evidence automation and LLM-agent security.
 
 I build reusable CloudFormation & Terraform modules, auto-remediation patterns, observability dashboards, and credential/identity tooling that avoid long-lived access keys.
 
@@ -17,6 +17,10 @@ I build reusable CloudFormation & Terraform modules, auto-remediation patterns, 
 | [**aws-orgseed**](https://github.com/DustyStudy/aws-orgseed) | Multi-org account seeding via hub-and-spoke OIDC (no long-lived credentials) |
 | [**aws-orgctl**](https://github.com/DustyStudy/aws-orgctl) | Ephemeral SSO / IAM Identity Center credential manager |
 | [**ai-terraform-toolkit**](https://github.com/DustyStudy/ai-terraform-toolkit) | Security-hardened Terraform modules + Claude / Gemini AI workflows |
+| [**aws-platform**](https://github.com/DustyStudy/aws-platform) | Self-service AWS platform on EKS: golden-path tenant onboarding, OIDC-only CI/CD, policy-as-code guardrails |
+| [**azure-lighthouse-tf**](https://github.com/DustyStudy/azure-lighthouse-tf) | Terraform for Azure Lighthouse delegated management across Azure Public and Government, with GitHub Actions CI/CD |
+| [**grc-evidence-automation**](https://github.com/DustyStudy/grc-evidence-automation) | Scheduled, tamper-evident AWS/GCP control evidence mapped to SOC 2, ISO 27001, NIST 800-53 and FedRAMP 20x KSIs |
+| [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit) | Prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation and audit log for LLM agents |
 
 All libraries emphasize:
 
