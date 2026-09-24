@@ -12,6 +12,7 @@ I build reusable CloudFormation & Terraform modules, auto-remediation patterns, 
 |------------|---------|
 | [**fedramp-terraform-library**](https://github.com/DustyStudy/fedramp-terraform-library) | Terraform modules implementing NIST 800-53 Rev5 Moderate/High controls + FedRAMP 20x KSIs |
 | [**fedramp-cfn-library**](https://github.com/DustyStudy/fedramp-cfn-library) | CloudFormation counterpart of the above |
+| [**fedramp-cloud-compliance-skill**](https://github.com/DustyStudy/fedramp-cloud-compliance-skill) | Agent Skill for Claude Code / agents: FedRAMP 2026 Consolidated Rules (Rev5 + 20x) on AWS, Azure, GCP |
 | [**aws-cloud-security-toolbox**](https://github.com/DustyStudy/aws-cloud-security-toolbox) | Practical guardrails, auto-remediation, AI/ML protections (CFN + TF) |
 | [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator) | Security Hub-driven remediation engine: policy registry, blast-radius guardrails, human approval gate, and compliance-evidence export (Step Functions + Lambda + SSM) |
 | [**aws-observability-dashboards**](https://github.com/DustyStudy/aws-observability-dashboards) | CloudWatch dashboards for security posture, Bedrock, agentic AI, NHI, EKS |
