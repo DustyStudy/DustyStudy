@@ -1,17 +1,8 @@
 <div align="center">
 
-<!-- HEADER -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=180&section=header&text=Dustin%20Arrington&fontSize=46&fontColor=fff&animation=twinkling&fontAlignY=32&desc=Senior%20Cloud%20Engineer%20%7C%20AWS%20Cloud%20Security%20%7C%20FedRAMP%20%2F%20NIST%20800-53&descAlignY=54&descSize=18" width="100%" alt="Dustin Arrington - Senior Cloud Engineer" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=180&section=header&text=Dustin%20Arrington&fontSize=46&fontColor=fff&fontAlignY=32&desc=Senior%20Cloud%20Engineer%20%7C%20AWS%20Cloud%20Security%20%7C%20FedRAMP%20%2F%20NIST%20800-53&descAlignY=54&descSize=18" width="100%" alt="Dustin Arrington - Senior Cloud Engineer" />
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=58A6FF&center=true&vCenter=true&random=false&width=640&lines=FedRAMP+Rev5+%2B+20x+as+code;NIST+800-53+controls+in+Terraform+%26+CloudFormation;Zero+long-lived+credentials;Multi-account+AWS+governance;Securing+LLM+agents)](https://github.com/DustyStudy)
-
-<br/>
-
-<a href="https://github.com/DustyStudy?tab=followers"><img src="https://img.shields.io/github/followers/DustyStudy?label=Followers&style=for-the-badge&logo=github&logoColor=white&labelColor=1a1b27&color=58a6ff" alt="followers" /></a>
-<img src="https://img.shields.io/github/stars/DustyStudy?label=Total%20Stars&style=for-the-badge&logo=github&logoColor=white&labelColor=1a1b27&color=58a6ff" alt="stars" />
-<img src="https://komarev.com/ghpvc/?username=DustyStudy&style=for-the-badge&color=blueviolet&labelColor=1a1b27" alt="profile views" />
-
-<br/><br/>
+**Senior Cloud Engineer** building FedRAMP- and NIST 800-53-aligned cloud security as code across AWS (commercial + GovCloud), Azure, and GCP.
 
 <a href="https://www.linkedin.com/in/dustyarrington/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
 
@@ -39,20 +30,6 @@ class DustinArrington:
             "Every repo scanned in CI (Checkov, Trivy, Gitleaks, tflint)",
         ]
 ```
-
----
-
-<div align="center">
-
-## Contribution Graph
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DustyStudy/DustyStudy/output/snake-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/DustyStudy/DustyStudy/output/snake.svg" />
-  <img alt="contribution snake" src="https://raw.githubusercontent.com/DustyStudy/DustyStudy/output/snake-dark.svg" />
-</picture>
-
-</div>
 
 ---
 
@@ -139,41 +116,6 @@ class DustinArrington:
 ![Prowler](https://img.shields.io/badge/Prowler-1F2937?style=for-the-badge&logoColor=white)
 ![Security Hub](https://img.shields.io/badge/Security%20Hub-DD344C?style=for-the-badge&logo=amazonwebservices&logoColor=white)
 ![Bedrock](https://img.shields.io/badge/Bedrock-01A88D?style=for-the-badge&logo=amazonwebservices&logoColor=white)
-
-</div>
-
----
-
-## GitHub Stats
-
-<div align="center">
-
-<img width="49%" src="https://streak-stats.demolab.com/?user=DustyStudy&theme=tokyonight&hide_border=true&background=0D1117&stroke=58a6ff&ring=58a6ff&fire=58a6ff&currStreakLabel=58a6ff" alt="streak stats" />
-<img width="49%" src="https://github-readme-stats.vercel.app/api?username=DustyStudy&show_icons=true&theme=tokyonight&hide_border=true&bg_color=0D1117&title_color=58a6ff&icon_color=58a6ff&text_color=c9d1d9" alt="GitHub stats" />
-
-<img width="100%" src="https://github-readme-activity-graph.vercel.app/graph?username=DustyStudy&bg_color=0D1117&color=58a6ff&line=58a6ff&point=58a6ff&area=true&hide_border=true" alt="activity graph" />
-
-</div>
-
-<details>
-<summary><b>More Stats</b></summary>
-<div align="center">
-
-<img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=DustyStudy&theme=github_dark" alt="profile details" />
-
-<img src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=DustyStudy&theme=github_dark" alt="repos per language" />
-<img src="https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=DustyStudy&theme=github_dark" alt="most commit language" />
-
-</div>
-</details>
-
----
-
-## GitHub Trophies
-
-<div align="center">
-
-[![trophy](https://github-profile-trophy.vercel.app/?username=DustyStudy&theme=onestar&no-frame=true&no-bg=true&column=7&margin-w=15)](https://github.com/ryo-ma/github-profile-trophy)
 
 </div>
 
