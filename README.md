@@ -1,7 +1,7 @@
 <div align="center">
 
 <!-- HEADER -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=180&section=header&text=Dusty&fontSize=48&fontColor=fff&animation=twinkling&fontAlignY=32&desc=AWS%20Cloud%20Security%20%7C%20FedRAMP%20%2F%20NIST%20800-53%20%7C%20Open%20Source&descAlignY=54&descSize=18" width="100%" alt="Dusty - AWS Cloud Security" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=180&section=header&text=Dustin%20Arrington&fontSize=46&fontColor=fff&animation=twinkling&fontAlignY=32&desc=Senior%20Cloud%20Engineer%20%7C%20AWS%20Cloud%20Security%20%7C%20FedRAMP%20%2F%20NIST%20800-53&descAlignY=54&descSize=18" width="100%" alt="Dustin Arrington - Senior Cloud Engineer" />
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=58A6FF&center=true&vCenter=true&random=false&width=640&lines=FedRAMP+Rev5+%2B+20x+as+code;NIST+800-53+controls+in+Terraform+%26+CloudFormation;Zero+long-lived+credentials;Multi-account+AWS+governance;Securing+LLM+agents)](https://github.com/DustyStudy)
 
@@ -11,6 +11,10 @@
 <img src="https://img.shields.io/github/stars/DustyStudy?label=Total%20Stars&style=for-the-badge&logo=github&logoColor=white&labelColor=1a1b27&color=58a6ff" alt="stars" />
 <img src="https://komarev.com/ghpvc/?username=DustyStudy&style=for-the-badge&color=blueviolet&labelColor=1a1b27" alt="profile views" />
 
+<br/><br/>
+
+<a href="https://www.linkedin.com/in/dustyarrington/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
+
 </div>
 
 <br/>
@@ -18,8 +22,9 @@
 ## About Me
 
 ```python
-class Dusty:
+class DustinArrington:
     def __init__(self):
+        self.role = "Senior Cloud Engineer"
         self.focus = "AWS cloud security & compliance automation"
         self.clouds = ["AWS (commercial + GovCloud)", "Azure (Public + Government)", "GCP"]
         self.frameworks = ["FedRAMP Rev5", "FedRAMP 20x KSIs", "NIST 800-53 Rev5",
@@ -181,6 +186,6 @@ class Dusty:
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=100&section=footer" width="100%" alt="" />
 
-**AWS Cloud Security** | FedRAMP / NIST 800-53 | Multi-Account Governance | Open Source
+**Dustin Arrington** | Senior Cloud Engineer | AWS Cloud Security | FedRAMP / NIST 800-53 | Multi-Account Governance | Open Source
 
 </div>
