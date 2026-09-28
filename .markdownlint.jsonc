@@ -4,5 +4,7 @@
   // Allow raw HTML (e.g. badges, <br>) if ever needed.
   "MD033": false,
   // Compact vs. padded table pipes is a style choice, not a rendering issue.
-  "MD060": false
+  "MD060": false,
+  // Profile README opens with a centered HTML banner, not an H1.
+  "MD041": false
 }
