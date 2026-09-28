@@ -75,6 +75,7 @@ class DustinArrington:
 |:--:|------------|---------|
 | :toolbox: | [**aws-cloud-security-toolbox**](https://github.com/DustyStudy/aws-cloud-security-toolbox) | Practical guardrails, auto-remediation, AI/ML protections (CFN + TF) |
 | :rotating_light: | [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator) | Security Hub-driven remediation: policy registry, blast-radius guardrails, human approval gate |
+| :mag: | [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template) | Org-wide Prowler scans for under $1/month: GitHub Actions + OIDC, StackSet read-only roles, emailed HTML reports |
 | :bar_chart: | [**aws-observability-dashboards**](https://github.com/DustyStudy/aws-observability-dashboards) | CloudWatch dashboards for security posture, Bedrock, agentic AI, NHI, EKS |
 | :seedling: | [**aws-orgseed**](https://github.com/DustyStudy/aws-orgseed) | Multi-org account seeding via hub-and-spoke OIDC (no long-lived credentials) |
 | :key: | [**aws-orgctl**](https://github.com/DustyStudy/aws-orgctl) | Ephemeral SSO / IAM Identity Center credential manager |
@@ -135,6 +136,7 @@ class DustinArrington:
 ![Checkov](https://img.shields.io/badge/Checkov-5C4EE5?style=for-the-badge&logoColor=white)
 ![Trivy](https://img.shields.io/badge/Trivy-1904DA?style=for-the-badge&logo=trivy&logoColor=white)
 ![Gitleaks](https://img.shields.io/badge/Gitleaks-DC382D?style=for-the-badge&logoColor=white)
+![Prowler](https://img.shields.io/badge/Prowler-1F2937?style=for-the-badge&logoColor=white)
 ![Security Hub](https://img.shields.io/badge/Security%20Hub-DD344C?style=for-the-badge&logo=amazonwebservices&logoColor=white)
 ![Bedrock](https://img.shields.io/badge/Bedrock-01A88D?style=for-the-badge&logo=amazonwebservices&logoColor=white)
 
