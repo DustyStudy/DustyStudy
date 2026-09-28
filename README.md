@@ -95,6 +95,12 @@ class DustinArrington:
 |:--:|------------|---------|
 | :test_tube: | [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit) | Prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation, audit log |
 
+### Tooling
+
+| | Repository | Purpose |
+|:--:|------------|---------|
+| :computer: | [**workstation-bootstrap**](https://github.com/DustyStudy/workstation-bootstrap) | Workstation bootstrap (Windows / macOS / WSL2) for Terraform and AWS tooling, with automated tool-version pin checks |
+
 </div>
 
 ---
