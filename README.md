@@ -1,6 +1,6 @@
 # Dustin Arrington
 
-**Senior Cloud Engineer** focused on cloud security and compliance automation: FedRAMP (Rev5 and 20x) and NIST 800-53 controls implemented as code across AWS (commercial and GovCloud), Azure, and GCP.
+**Senior Cloud Engineer** focused on cloud security and compliance automation: FedRAMP (Rev5 and 20x) and NIST 800-53 controls implemented as code on AWS, in both commercial regions and GovCloud.
 
 I build multi-account guardrails, audit evidence pipelines, and remediation workflows that run on short-lived credentials only (OIDC and SSO, no long-lived keys). Every repo below has automated tests (`terraform test`, cfn-guard, pytest) and is scanned in CI with Checkov, Trivy, and Gitleaks. Each one documents its coverage gaps rather than hiding them. I use AI coding assistants (Claude Code) for drafting and review. I design each system, and I verify it with tests and, where noted, live deployments.
 
@@ -33,13 +33,6 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 | [**aws-orgctl**](https://github.com/DustyStudy/aws-orgctl) | CLI for ephemeral IAM Identity Center credentials across many accounts |
 | [**aws-platform**](https://github.com/DustyStudy/aws-platform) | Self-service EKS platform: golden-path tenant onboarding, OIDC-only CI/CD, policy as code |
 
-### Multi-cloud baselines
-
-| Repository | What it does |
-|------------|--------------|
-| [**multicloud-baselines-tf**](https://github.com/DustyStudy/multicloud-baselines-tf) | Azure and GCP baselines: Azure Policy and org policy guardrails, immutable audit-log archives, keyless GitHub Actions auth |
-| [**azure-lighthouse-tf**](https://github.com/DustyStudy/azure-lighthouse-tf) | Azure Lighthouse delegated management across Azure Public and Azure Government |
-
 ### AI agent security
 
 | Repository | What it does |
@@ -48,7 +41,7 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 
 ## Tools and platforms
 
-**Cloud:** AWS (including GovCloud), Azure (including Government), GCP, EKS<br>
+**Cloud:** AWS (including GovCloud), EKS<br>
 **Infrastructure as code:** Terraform, CloudFormation, GitHub Actions<br>
 **Languages:** Python, HCL, PowerShell, Bash<br>
 **Security tooling:** Checkov, Trivy, Gitleaks, Prowler, Security Hub, GuardDuty, AWS Config<br>
