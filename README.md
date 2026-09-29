@@ -2,9 +2,15 @@
 
 **Senior Cloud Engineer** focused on cloud security and compliance automation: FedRAMP (Rev5 and 20x) and NIST 800-53 controls implemented as code across AWS (commercial and GovCloud), Azure, and GCP.
 
-I build multi-account guardrails, audit evidence pipelines, and remediation workflows that run on short-lived credentials only (OIDC and SSO, no long-lived keys). Every repo below is scanned in CI with Checkov, Trivy, and Gitleaks, and documents its coverage gaps rather than hiding them.
+I build multi-account guardrails, audit evidence pipelines, and remediation workflows that run on short-lived credentials only (OIDC and SSO, no long-lived keys). Every repo below has automated tests (`terraform test`, cfn-guard, pytest) and is scanned in CI with Checkov, Trivy, and Gitleaks. Each one documents its coverage gaps rather than hiding them.
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/dustyarrington/)
+
+## Start here
+
+- [**fedramp-terraform-library**](https://github.com/DustyStudy/fedramp-terraform-library): NIST 800-53 Rev5 and FedRAMP 20x controls as Terraform modules, with plan-time tests that check the rendered IAM and bucket policies.
+- [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator): Security Hub findings routed through policy, blast-radius limits and a human approval gate. [Tested against a real AWS account](https://github.com/DustyStudy/aws-remediation-orchestrator/blob/main/docs/PROOF.md).
+- [**grc-evidence-automation**](https://github.com/DustyStudy/grc-evidence-automation): scheduled, tamper-evident control evidence for SOC 2, ISO 27001, NIST 800-53 and FedRAMP 20x. [Deployed and verified in a live account](https://github.com/DustyStudy/grc-evidence-automation/blob/main/docs/live-deployment-verification.md).
 
 ## Projects
 
@@ -32,9 +38,8 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 
 | Repository | What it does |
 |------------|--------------|
-| [**azure-baseline-tf**](https://github.com/DustyStudy/azure-baseline-tf) | Azure Policy guardrails, immutable Activity Log archive, keyless GitHub Actions auth |
+| [**multicloud-baselines-tf**](https://github.com/DustyStudy/multicloud-baselines-tf) | Azure and GCP baselines: Azure Policy and org policy guardrails, immutable audit-log archives, keyless GitHub Actions auth |
 | [**azure-lighthouse-tf**](https://github.com/DustyStudy/azure-lighthouse-tf) | Azure Lighthouse delegated management across Azure Public and Azure Government |
-| [**gcp-org-baseline-tf**](https://github.com/DustyStudy/gcp-org-baseline-tf) | GCP org policy guardrails, locked audit-log archive, Workload Identity Federation |
 
 ### AI agent security
 
