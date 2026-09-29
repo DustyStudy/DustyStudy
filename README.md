@@ -29,7 +29,7 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 | [**aws-cloud-security-toolbox**](https://github.com/DustyStudy/aws-cloud-security-toolbox) | Guardrails, auto-remediation, and AI/ML protections in Terraform |
 | [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator) | Security Hub-driven remediation with a policy registry, blast-radius guardrails, and a human approval gate |
 | [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template) | Org-wide Prowler scans for under $1/month: GitHub Actions, OIDC, StackSet read-only roles, emailed reports |
-| [**aws-orgctl**](https://github.com/DustyStudy/aws-orgctl) | CLI for ephemeral IAM Identity Center credentials across many accounts |
+| [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker) | CLI for ephemeral IAM Identity Center credentials across many accounts |
 | [**aws-platform**](https://github.com/DustyStudy/aws-platform) | Self-service EKS platform: golden-path tenant onboarding, OIDC-only CI/CD, policy as code |
 
 ### AI agent security
