@@ -30,7 +30,6 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 | [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator) | Security Hub-driven remediation with a policy registry, blast-radius guardrails, and a human approval gate. Five playbooks (S3 exposure, open SSH/RDP, compromised and stale keys, instance isolation) and optional Wiz intake |
 | [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template) | Org-wide Prowler scans for under $1/month: GitHub Actions, OIDC, StackSet read-only roles, emailed reports |
 | [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker) | CLI for ephemeral IAM Identity Center credentials across many accounts |
-| [**aws-platform**](https://github.com/DustyStudy/aws-platform) | Self-service EKS platform: golden-path tenant onboarding, OIDC-only CI/CD, policy as code |
 
 ### AI security
 
@@ -41,7 +40,7 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 
 ## Tools and platforms
 
-**Cloud:** AWS (including GovCloud), EKS<br>
+**Cloud:** AWS (including GovCloud)<br>
 **Infrastructure as code:** Terraform, GitHub Actions<br>
 **Languages:** Python, HCL, PowerShell, Bash<br>
 **Security tooling:** Checkov, Trivy, Gitleaks, Prowler, Security Hub, GuardDuty, AWS Config<br>
