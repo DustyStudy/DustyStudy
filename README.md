@@ -27,16 +27,16 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 
 | Repository | What it does |
 |------------|--------------|
-| [**aws-cloud-security-toolbox**](https://github.com/DustyStudy/aws-cloud-security-toolbox) | Guardrails, auto-remediation, and AI/ML protections in Terraform |
-| [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator) | Security Hub-driven remediation with a policy registry, blast-radius guardrails, and a human approval gate |
+| [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator) | Security Hub-driven remediation with a policy registry, blast-radius guardrails, and a human approval gate. Five playbooks (S3 exposure, open SSH/RDP, compromised and stale keys, instance isolation) and optional Wiz intake |
 | [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template) | Org-wide Prowler scans for under $1/month: GitHub Actions, OIDC, StackSet read-only roles, emailed reports |
 | [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker) | CLI for ephemeral IAM Identity Center credentials across many accounts |
 | [**aws-platform**](https://github.com/DustyStudy/aws-platform) | Self-service EKS platform: golden-path tenant onboarding, OIDC-only CI/CD, policy as code |
 
-### AI agent security
+### AI security
 
 | Repository | What it does |
 |------------|--------------|
+| [**aws-ai-guardrails**](https://github.com/DustyStudy/aws-ai-guardrails) | Terraform guardrails for Bedrock and SageMaker: SCPs, agent IAM audits, invocation-logging enforcement, cost controls |
 | [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit) | Prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation, tamper-evident audit log |
 
 ## Tools and platforms
