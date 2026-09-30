@@ -37,7 +37,7 @@ Gaps I found in my own tooling after reviewing AWS attack techniques in active u
 | Repository | What it does |
 |------------|--------------|
 | [**aws-org-guardrails**](https://github.com/DustyStudy/aws-org-guardrails) | Organization guardrails: SCP bundles, a permissions boundary against privilege escalation, and Identity Center permission sets that require it. Commercial and GovCloud |
-| [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator) | Security Hub-driven remediation with a policy registry, blast-radius guardrails, and a human approval gate. Five playbooks (S3 exposure, open SSH/RDP, compromised and stale keys, instance isolation) and optional Wiz intake |
+| [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator) | Security Hub-driven remediation with a policy registry, blast-radius guardrails, and a human approval gate. Six playbooks (S3 exposure, open SSH/RDP and database ports, compromised and stale keys, role session revocation, instance isolation) and optional Wiz intake |
 | [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template) | Org-wide Prowler scans for under $1/month: GitHub Actions, OIDC, StackSet read-only roles, emailed reports |
 | [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker) | CLI for ephemeral IAM Identity Center credentials across many accounts |
 
