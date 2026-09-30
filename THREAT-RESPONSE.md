@@ -1,0 +1,18 @@
+# Threat response log
+
+Changes made to the public repos in response to AWS attack techniques and public threat reporting. Each entry names the technique, the gap it exposed in my own tooling, and the change that closed it.
+
+An entry means the repo now has a control for that technique. It does not mean the technique is fully prevented. Each linked PR lists what was tested and what was not.
+
+Newest first.
+
+## 2026-09
+
+| Date | Technique | Gap found | Change |
+|------|-----------|-----------|--------|
+| 2026-09-30 | Internet-exposed databases ([Security Hub EC2.19](https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-19), [T1190](https://attack.mitre.org/techniques/T1190/)) | The open-ingress playbook only closed SSH and RDP. A security group opening PostgreSQL, MySQL or Redis to `0.0.0.0/0` had no automated response. | [aws-remediation-orchestrator v1.1.0](https://github.com/DustyStudy/aws-remediation-orchestrator/releases/tag/v1.1.0): configurable port list, with common database ports on by default |
+| 2026-09-30 | Privilege escalation through a single IAM action ([T1098.003](https://attack.mitre.org/techniques/T1098/003/)) | The Identity Center auditor caught `AdministratorAccess` and `iam:*`, but not a permission set granting `iam:PutRolePolicy` or `sso:CreateAccountAssignment` on `*`. | [fedramp-terraform-library v1.2.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v1.2.0): escalation-action check in `identity-center-access-auditor` |
+| 2026-09-30 | Database access through over-broad IAM auth and public endpoints ([T1078.004](https://attack.mitre.org/techniques/T1078/004/)) | No audit covered databases built outside the hardened module: public endpoints, `rds-db:connect` as any user, or unmanaged master passwords. | [fedramp-terraform-library v1.2.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v1.2.0): `rds-access-auditor` module, plus a PostgreSQL role audit tested in CI |
+| 2026-09-30 | Stolen instance-role credentials ([GuardDuty InstanceCredentialExfiltration](https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_finding-types-iam.html), [T1552.005](https://attack.mitre.org/techniques/T1552/005/)) | The orchestrator could disable IAM user keys but had no response for stolen role sessions. Testing against real finding shapes also showed the key-disable playbook read the wrong resource. | [aws-remediation-orchestrator v1.1.0](https://github.com/DustyStudy/aws-remediation-orchestrator/releases/tag/v1.1.0): `RevokeRoleSessions` playbook ([#8](https://github.com/DustyStudy/aws-remediation-orchestrator/pull/8)) and the user-lookup fix ([#9](https://github.com/DustyStudy/aws-remediation-orchestrator/pull/9)) |
+| 2026-09-30 | Data sharing to outside accounts through AWS RAM ([T1537](https://attack.mitre.org/techniques/T1537/)) | The SCP bundles blocked public S3 access but not a RAM share to an account outside the organization. | [aws-org-guardrails#7](https://github.com/DustyStudy/aws-org-guardrails/pull/7): SCP statements denying external RAM shares, including shares created before the guardrail |
+| 2026-09-30 | Over-trusting OIDC and cross-account role trust ([T1078.004](https://attack.mitre.org/techniques/T1078/004/)) | Nothing reported roles that GitHub OIDC or outside accounts could assume with loose conditions. A read-only run against a real 4-account organization found one, a deploy role that accepted any branch. | [fedramp-terraform-library v1.2.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v1.2.0): `trust-policy-auditor` module |

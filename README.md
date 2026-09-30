@@ -14,6 +14,14 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 - [**aws-org-guardrails**](https://github.com/DustyStudy/aws-org-guardrails): SCPs, a permissions boundary and Identity Center permission sets for AWS Organizations, tested as policy behavior against the JSON Terraform renders.
 - [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker): short-lived IAM Identity Center credentials across many accounts, with no long-lived access keys.
 
+## Recent threat response
+
+Gaps I found in my own tooling after reviewing AWS attack techniques, and the change that closed each one. Full list: [THREAT-RESPONSE.md](THREAT-RESPONSE.md).
+
+- **Stolen instance-role credentials:** the remediation orchestrator could disable IAM user keys but not revoke role sessions. Added `RevokeRoleSessions` in [aws-remediation-orchestrator v1.1.0](https://github.com/DustyStudy/aws-remediation-orchestrator/releases/tag/v1.1.0).
+- **Escalation through one IAM action:** the Identity Center auditor missed permission sets granting `iam:PutRolePolicy` or `sso:CreateAccountAssignment` on `*`. Added in [fedramp-terraform-library v1.2.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v1.2.0).
+- **Data shared to outside accounts through AWS RAM:** added SCP statements denying external shares in [aws-org-guardrails#7](https://github.com/DustyStudy/aws-org-guardrails/pull/7).
+
 ## Projects
 
 ### FedRAMP and compliance
