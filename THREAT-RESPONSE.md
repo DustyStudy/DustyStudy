@@ -1,4 +1,4 @@
-# Threat response log
+# Threat-informed hardening log
 
 Changes made to the public repos in response to AWS attack techniques and public threat reporting. Each entry names the technique, links public reporting of attackers using it, and describes the gap it exposed in my own tooling and the change that closed it.
 
