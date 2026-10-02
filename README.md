@@ -22,31 +22,40 @@ Gaps I found in my own tooling after reviewing AWS attack techniques in active u
 - **Escalation through one IAM action:** the Identity Center auditor missed permission sets granting `iam:PutRolePolicy` or `sso:CreateAccountAssignment` on `*`. Added in [fedramp-terraform-library v1.2.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v1.2.0). Seen in the wild: [Sysdig, 2026](https://www.sysdig.com/blog/ai-assisted-cloud-intrusion-achieves-admin-access-in-8-minutes).
 - **Internet-exposed databases:** the open-ingress playbook only closed SSH and RDP. It now also closes database ports in [aws-remediation-orchestrator v1.1.0](https://github.com/DustyStudy/aws-remediation-orchestrator/releases/tag/v1.1.0). Seen in the wild: [Wiz, 2025](https://www.wiz.io/blog/postgresql-cryptomining).
 
-## Projects
+## How the repos fit together
 
-### FedRAMP and compliance
+```mermaid
+flowchart LR
+  subgraph prevent["Prevent"]
+    org["aws-org-guardrails<br/>org SCPs, permissions boundary"]
+    ai["aws-ai-guardrails<br/>Bedrock and SageMaker SCPs"]
+    lib["fedramp-terraform-library<br/>account baselines and auditors"]
+  end
+  subgraph access["Access"]
+    sso["aws-sso-broker<br/>short-lived Identity Center credentials"]
+  end
+  subgraph detect["Detect"]
+    prowler["prowler-aws-template<br/>org-wide CSPM scans"]
+    sh["Security Hub findings"]
+  end
+  subgraph respond["Respond"]
+    rem["aws-remediation-orchestrator<br/>governed auto-remediation"]
+  end
+  subgraph prove["Prove"]
+    grc["grc-evidence-automation<br/>tamper-evident control evidence"]
+  end
+  prevent --> detect --> respond
+  sh --> rem
+  prevent --> prove
+  respond --> prove
+```
 
-| Repository | What it does |
-|------------|--------------|
-| [**fedramp-terraform-library**](https://github.com/DustyStudy/fedramp-terraform-library) | Terraform modules implementing NIST 800-53 Rev5 Moderate/High controls and FedRAMP 20x KSIs |
-| [**grc-evidence-automation**](https://github.com/DustyStudy/grc-evidence-automation) | Scheduled, tamper-evident AWS/GCP control evidence mapped to SOC 2, ISO 27001, NIST 800-53, and FedRAMP 20x |
-| [**fedramp-cloud-compliance-skill**](https://github.com/DustyStudy/fedramp-cloud-compliance-skill) | Claude Code Agent Skill for the FedRAMP 2026 Consolidated Rules (Rev5 and 20x) on AWS, Azure, and GCP |
+## Also here
 
-### AWS security and governance
-
-| Repository | What it does |
-|------------|--------------|
-| [**aws-org-guardrails**](https://github.com/DustyStudy/aws-org-guardrails) | Organization guardrails: SCP bundles, a permissions boundary against privilege escalation, and Identity Center permission sets that require it. Commercial and GovCloud |
-| [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator) | Security Hub-driven remediation with a policy registry, blast-radius guardrails, and a human approval gate. Six playbooks (S3 exposure, open SSH/RDP and database ports, compromised and stale keys, role session revocation, instance isolation) and optional Wiz intake |
-| [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template) | Org-wide Prowler scans for under $1/month: GitHub Actions, OIDC, StackSet read-only roles, emailed reports |
-| [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker) | CLI for ephemeral IAM Identity Center credentials across many accounts: PKCE sign-in, guardrails for protected accounts, and an audit log that joins to CloudTrail |
-
-### AI security
-
-| Repository | What it does |
-|------------|--------------|
-| [**aws-ai-guardrails**](https://github.com/DustyStudy/aws-ai-guardrails) | Terraform guardrails for Bedrock and SageMaker: SCPs, agent IAM audits, invocation-logging enforcement, cost controls |
-| [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit) | Prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation, tamper-evident audit log |
+- [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit): prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation and a tamper-evident audit log for LLM agents.
+- [**aws-ai-guardrails**](https://github.com/DustyStudy/aws-ai-guardrails): Terraform guardrails for Bedrock and SageMaker: SCPs, agent IAM audits, invocation-logging enforcement and cost controls.
+- [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template): org-wide Prowler scans for under $1/month with GitHub Actions, OIDC and StackSet read-only roles.
+- [**fedramp-cloud-compliance-skill**](https://github.com/DustyStudy/fedramp-cloud-compliance-skill): Claude Code Agent Skill for the FedRAMP 2026 Consolidated Rules (Rev5 and 20x) on AWS, Azure and GCP.
 
 ## Tools and platforms
 
