@@ -1,0 +1,6 @@
+# GitHub returns 503 to automated clients for /blob/ pages (seen on main since
+# 2026-10-02; repo pages still return 200). Check the same file through
+# raw.githubusercontent.com instead, which still returns 404 for a missing file.
+remap = [
+  'https://github\.com/([^/]+)/([^/]+)/blob/(.+) https://raw.githubusercontent.com/$1/$2/$3',
+]
