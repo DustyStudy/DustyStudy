@@ -8,6 +8,13 @@ An entry means the repo now has a control for that technique. It does not mean t
 
 Newest first.
 
+## 2026-10
+
+| Date | Technique | Seen in the wild | Gap found | Change |
+|------|-----------|------------------|-----------|--------|
+| 2026-10-02 | Credentials in files on developer machines ([T1552.001](https://attack.mitre.org/techniques/T1552/001/)) | [Wiz, 2026: infostealer logs collect `~/.aws/credentials` and the AWS CLI SSO token cache; AWS secrets were 46% of the cloud credentials found](https://www.wiz.io/blog/infostealer-incursion-cloud-ai-credentials) | The SSO broker protected its own token cache but said nothing about long-lived keys or `aws sso login` tokens left in the AWS CLI's files on the same machine. | [aws-sso-broker#14](https://github.com/DustyStudy/aws-sso-broker/pull/14): `ssobroker doctor` flags those files; `--strict` fails the check |
+| 2026-10-02 | Argument injection through an AI agent's command tool ([T1059](https://attack.mitre.org/techniques/T1059/)) | No public in-the-wild report found. The [AWS bulletin for CVE-2026-97662](https://aws.amazon.com/security/security-bulletins/2026-121-aws/) reports the vulnerability, not exploitation. | The agent command runner removed the shell but could not stop an agent-supplied value starting with `-` from being parsed as an option. | [ai-agent-security-toolkit#35](https://github.com/DustyStudy/ai-agent-security-toolkit/pull/35): option allowlist for `SafeCommandRunner`, with a fuzz target |
+
 ## 2026-09
 
 | Date | Technique | Seen in the wild | Gap found | Change |

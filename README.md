@@ -18,9 +18,9 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 
 Gaps I found in my own tooling after reviewing AWS attack techniques in active use, and the change that closed each one. Full log, with sources: [THREAT-RESPONSE.md](THREAT-RESPONSE.md).
 
+- **AWS credentials left on laptops:** the SSO broker locked down its own cache but ignored long-lived keys and AWS CLI SSO tokens on the same machine. `ssobroker doctor` now flags them in [aws-sso-broker#14](https://github.com/DustyStudy/aws-sso-broker/pull/14). Seen in the wild: [Wiz, 2026](https://www.wiz.io/blog/infostealer-incursion-cloud-ai-credentials).
 - **Malicious Terraform providers:** the library's CI never checked provider sources, so a typosquatted namespace would have passed. Added a provider allowlist test in [fedramp-terraform-library#32](https://github.com/DustyStudy/fedramp-terraform-library/pull/32). Seen in the wild: [Aikido, 2026](https://www.aikido.dev/blog/graphalgo-terraform-go-modules).
 - **LLMjacking with leaked access keys:** the AI guardrails limited which Bedrock models ran, not who could run them. Added an opt-in SCP denying Bedrock to IAM users in [aws-ai-guardrails#29](https://github.com/DustyStudy/aws-ai-guardrails/pull/29). Seen in the wild: [FortiGuard Labs, 2026](https://www.fortinet.com/blog/threat-research/someone-else-is-using-your-ai).
-- **Internet-exposed databases:** the open-ingress playbook only closed SSH and RDP. It now also closes database ports in [aws-remediation-orchestrator v1.1.0](https://github.com/DustyStudy/aws-remediation-orchestrator/releases/tag/v1.1.0). Seen in the wild: [Wiz, 2025](https://www.wiz.io/blog/postgresql-cryptomining).
 
 ## How the repos fit together
 
