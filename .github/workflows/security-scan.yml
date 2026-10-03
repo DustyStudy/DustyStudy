@@ -8,7 +8,6 @@ name: Security Scan (reusable)
 #       uses: DustyStudy/DustyStudy/.github/workflows/security-scan.yml@<sha>
 #       permissions:
 #         contents: read
-#         pull-requests: read
 #         security-events: write
 #         actions: read
 
@@ -32,10 +31,11 @@ jobs:
     name: Secrets (Gitleaks)
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # gitleaks-action lists the pull request's commits to scan only those.
     permissions:
       contents: read
-      pull-requests: read
+    env:
+      GITLEAKS_VERSION: "8.30.1"
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
     steps:
       - name: Harden runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -48,10 +48,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # The CLI, not gitleaks-action: the action scans <first PR commit>^..HEAD,
+      # which fails on a PR that brings in another repo's root commit.
+      - name: Install gitleaks (checksum-verified)
+        run: |
+          curl -sSLo gitleaks.tgz "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tgz" | sha256sum -c -
+          tar xzf gitleaks.tgz gitleaks
+
       - name: Scan full history for secrets
-        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gitleaks git . --redact --verbose
 
   checkov:
     name: Misconfiguration (Checkov)
