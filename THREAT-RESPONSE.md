@@ -1,6 +1,6 @@
 # Threat-informed hardening log
 
-Changes made to the public repos in response to AWS attack techniques and public threat reporting. Each entry names the technique, links public reporting of attackers using it, and describes the gap it exposed in my own tooling and the change that closed it.
+Changes made to the public repos in response to AWS attack techniques and public threat reporting. Each entry names the technique, links public reporting of attackers using it, and describes what the repo covered before and the control that was added.
 
 An entry means the repo now has a control for that technique. It does not mean the technique is fully prevented. Each linked PR lists what was tested and what was not.
 
@@ -10,15 +10,15 @@ Newest first.
 
 ## 2026-10
 
-| Date | Technique | Seen in the wild | Gap found | Change |
-|------|-----------|------------------|-----------|--------|
+| Date | Technique | Seen in the wild | Coverage before | Change |
+|------|-----------|------------------|-----------------|--------|
 | 2026-10-02 | Credentials in files on developer machines ([T1552.001](https://attack.mitre.org/techniques/T1552/001/)) | [Wiz, 2026: infostealer logs collect `~/.aws/credentials` and the AWS CLI SSO token cache; AWS secrets were 46% of the cloud credentials found](https://www.wiz.io/blog/infostealer-incursion-cloud-ai-credentials) | The SSO broker protected its own token cache but said nothing about long-lived keys or `aws sso login` tokens left in the AWS CLI's files on the same machine. | [aws-sso-broker#14](https://github.com/DustyStudy/aws-sso-broker/pull/14): `ssobroker doctor` flags those files; `--strict` fails the check |
 | 2026-10-02 | Argument injection through an AI agent's command tool ([T1059](https://attack.mitre.org/techniques/T1059/)) | No public in-the-wild report found. The [AWS bulletin for CVE-2026-97662](https://aws.amazon.com/security/security-bulletins/2026-121-aws/) reports the vulnerability, not exploitation. | The agent command runner removed the shell but could not stop an agent-supplied value starting with `-` from being parsed as an option. | [ai-agent-security-toolkit#35](https://github.com/DustyStudy/ai-agent-security-toolkit/pull/35): option allowlist for `SafeCommandRunner`, with a fuzz target |
 
 ## 2026-09
 
-| Date | Technique | Seen in the wild | Gap found | Change |
-|------|-----------|------------------|-----------|--------|
+| Date | Technique | Seen in the wild | Coverage before | Change |
+|------|-----------|------------------|-----------------|--------|
 | 2026-09-30 | Malicious Terraform provider in the supply chain ([T1195.001](https://attack.mitre.org/techniques/T1195/001/)) | [Aikido, 2026: malware published to the Terraform Registry as providers, including `kreuzwenker/docker`, a typosquat of `kreuzwerker/docker`](https://www.aikido.dev/blog/graphalgo-terraform-go-modules) | Nothing in the library's CI checked which provider sources its modules require. A contribution adding a mistyped or unknown provider namespace would have passed every test. | [fedramp-terraform-library#32](https://github.com/DustyStudy/fedramp-terraform-library/pull/32): CI test that fails on any provider source outside an allowlist, plus lock-file guidance for consumers |
 | 2026-09-30 | LLMjacking with long-term access keys ([T1496.004](https://attack.mitre.org/techniques/T1496/004/)) | [FortiGuard Labs, 2026: a leaked long-lived IAM access key was used to subscribe to and invoke Amazon Bedrock models at the victim's cost](https://www.fortinet.com/blog/threat-research/someone-else-is-using-your-ai) | The AI guardrail SCPs limited which models could be used, but not who could use them. A leaked IAM-user key could still invoke any allowed model. | [aws-org-guardrails@0d0cd55](https://github.com/DustyStudy/aws-org-guardrails/commit/0d0cd55ac3680206bb82cde9860edd6f809dfd92): opt-in SCP denying Bedrock invocation and model discovery to IAM users |
 | 2026-09-30 | Internet-exposed databases ([Security Hub EC2.19](https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-19), [T1190](https://attack.mitre.org/techniques/T1190/)) | [AWS CIRT: overly permissive security groups](https://aws-samples.github.io/threat-technique-catalog-for-aws/Techniques/T1190.A019.html); [Wiz, 2025: ransomware campaigns scanning for exposed ports 3306 and 5432](https://www.wiz.io/blog/database-ransomware-research) | The open-ingress playbook only closed SSH and RDP. A security group opening PostgreSQL, MySQL or Redis to `0.0.0.0/0` had no automated response. | [aws-remediation-orchestrator v1.1.0](https://github.com/DustyStudy/aws-remediation-orchestrator/releases/tag/v1.1.0): configurable port list, with common database ports on by default |
