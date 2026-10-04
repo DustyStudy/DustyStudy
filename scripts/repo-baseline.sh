@@ -4,6 +4,10 @@
 #   scripts/repo-baseline.sh <repo> [extra required check]...
 #   DRY_RUN=1 scripts/repo-baseline.sh <repo>     # print the writes only
 #
+# Pass the repo's own CI jobs (tests, lint, CodeQL) as extra required checks;
+# only the security-scan jobs are picked up automatically. Use the names a
+# pull request reports, not push-only jobs such as a release.
+#
 # Run it after creating a repo, and again after the repo's first CI run on
 # its default branch: only scan checks that have already passed there become
 # required, so a new repo is never blocked waiting on a check that never runs.
@@ -71,28 +75,42 @@ checks=$(jq -c -n --argjson a "$checks" '$ARGS.positional + $a | unique' --args 
 
 # --- Branch protection. A repo that already uses classic protection keeps
 # it (its settings and checks stay; the new checks are added). Anything
-# else gets a "Protect main" ruleset.
-if gh api "$R/branches/$branch/protection" >/dev/null 2>&1; then
-  if current=$(gh api "$R/branches/$branch/protection/required_status_checks" 2>/dev/null); then
-    jq -n --argjson cur "$current" --argjson add "$checks" \
-      '{strict: $cur.strict, checks: ([$cur.checks[].context] + $add | unique | map({context: ., app_id: 15368}))}' |
-      api -X PATCH "$R/branches/$branch/protection/required_status_checks" --input - --silent
-    echo "classic protection kept; required checks now include: $(jq -r 'join(", ")' <<<"$checks")"
-  else
-    echo "WARNING: classic protection has no status-check block; add the checks in the UI: $checks" >&2
-  fi
+# else gets a "Protect main" ruleset. Either way a PR must be up to date
+# with the base branch and have its review threads resolved.
+if current=$(gh api "$R/branches/$branch/protection" 2>/dev/null); then
+  # PUT replaces the whole rule, so every current setting is carried over.
+  # Push restrictions do not exist on a personal account's repos.
+  jq --argjson add "$checks" '{
+      required_status_checks: {strict: true,
+        checks: ([.required_status_checks.checks[]?.context] + $add | unique | map({context: ., app_id: 15368}))},
+      enforce_admins: .enforce_admins.enabled,
+      required_pull_request_reviews: (.required_pull_request_reviews // null | if . then
+        {dismiss_stale_reviews, require_code_owner_reviews, require_last_push_approval, required_approving_review_count}
+        else . end),
+      restrictions: null,
+      required_linear_history: .required_linear_history.enabled,
+      allow_force_pushes: .allow_force_pushes.enabled,
+      allow_deletions: .allow_deletions.enabled,
+      block_creations: .block_creations.enabled,
+      required_conversation_resolution: true,
+      lock_branch: .lock_branch.enabled,
+      allow_fork_syncing: .allow_fork_syncing.enabled}' <<<"$current" |
+    api -X PUT "$R/branches/$branch/protection" --input - --silent
+  echo "classic protection kept; required checks now include: $(jq -r 'join(", ")' <<<"$checks")"
 else
   id=$(gh api "$R/rulesets" --jq '.[] | select(.name == "Protect main") | .id')
   if [ -n "$id" ]; then
     # Keep every existing rule (code scanning, etc.); only merge in the checks.
     body=$(gh api "$R/rulesets/$id" | jq --argjson add "$checks" '
       {name, target, enforcement, conditions, bypass_actors, rules} |
+      (.rules[] | select(.type == "pull_request") | .parameters.required_review_thread_resolution) = true |
       if any(.rules[]; .type == "required_status_checks") then
         .rules |= map(if .type == "required_status_checks" then
+          .parameters.strict_required_status_checks_policy = true |
           .parameters.required_status_checks |= ((map(.context) + $add) | unique | map({context: ., integration_id: 15368}))
           else . end)
       elif ($add | length) > 0 then
-        .rules += [{type: "required_status_checks", parameters: {strict_required_status_checks_policy: false,
+        .rules += [{type: "required_status_checks", parameters: {strict_required_status_checks_policy: true,
           required_status_checks: ($add | map({context: ., integration_id: 15368}))}}]
       else . end')
     api -X PUT "$R/rulesets/$id" --input - --silent <<<"$body"
@@ -105,9 +123,9 @@ else
         {type: "pull_request", parameters: {
           required_approving_review_count: 0, dismiss_stale_reviews_on_push: false,
           require_code_owner_review: false, require_last_push_approval: false,
-          required_review_thread_resolution: false}}
+          required_review_thread_resolution: true}}
       ] + (if ($names | length) > 0 then [{type: "required_status_checks", parameters: {
-          strict_required_status_checks_policy: false,
+          strict_required_status_checks_policy: true,
           required_status_checks: ($names | map({context: ., integration_id: 15368}))}}] else [] end))}')
     api -X POST "$R/rulesets" --input - --silent <<<"$body"
   fi
