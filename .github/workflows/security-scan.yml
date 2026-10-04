@@ -94,6 +94,9 @@ jobs:
       security-events: write
       # upload-sarif reads the workflow run to label the upload.
       actions: read
+    env:
+      TRIVY_VERSION: "0.74.0"
+      TRIVY_SHA256: 2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a
     steps:
       - name: Harden runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -105,17 +108,19 @@ jobs:
         with:
           persist-credentials: false
 
+      # The CLI, not trivy-action: a checksum-verified release binary leaves
+      # one less third-party action to trust.
+      - name: Install trivy (checksum-verified)
+        run: |
+          cd "$RUNNER_TEMP"
+          curl -sSLo trivy.tgz "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          echo "${TRIVY_SHA256}  trivy.tgz" | sha256sum -c -
+          tar xzf trivy.tgz trivy
+
       - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          scanners: vuln,misconfig
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          format: sarif
-          output: trivy-results.sarif
-          exit-code: "0"
+        run: |
+          "$RUNNER_TEMP/trivy" fs . --scanners vuln,misconfig --severity HIGH,CRITICAL \
+            --ignore-unfixed --skip-dirs .git --format sarif --output trivy-results.sarif --exit-code 0
 
       # Code scanning needs a public repo (or GitHub Advanced Security).
       - name: Upload results to the Security tab
