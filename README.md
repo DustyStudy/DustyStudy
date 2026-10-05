@@ -16,9 +16,9 @@ I build multi-account guardrails, audit evidence pipelines, and remediation work
 
 I track AWS attack techniques in active use and update these repos as new ones are reported. Each entry is a technique, the control I added for it, and public reporting of attackers using it. Full log, with sources: [THREAT-RESPONSE.md](THREAT-RESPONSE.md).
 
+- **Leaked access keys used to send mail:** the SCP bundles already denied creating IAM users and access keys. An opt-in statement now also denies Amazon SES to IAM users, so an existing key that leaks cannot send mail or be used as an SES SMTP password, in [aws-org-guardrails#18](https://github.com/DustyStudy/aws-org-guardrails/pull/18). Seen in the wild: [LevelBlue SpiderLabs, 2026](https://www.levelblue.com/blogs/spiderlabs-blog/tiktouk-tracing-a-wordpress-credential-collection-toolkit).
 - **AWS credentials left on laptops:** infostealers collect long-lived keys and AWS CLI SSO tokens from developer machines. The SSO broker already locked down its own cache; `ssobroker doctor` now flags those other files too, in [aws-sso-broker#14](https://github.com/DustyStudy/aws-sso-broker/pull/14). Seen in the wild: [Wiz, 2026](https://www.wiz.io/blog/infostealer-incursion-cloud-ai-credentials).
 - **Malicious Terraform providers:** the library's CI now fails on any provider outside an allowlist, so a typosquatted namespace cannot pass. Added in [fedramp-terraform-library v2.0.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v2.0.0). Seen in the wild: [Aikido, 2026](https://www.aikido.dev/blog/graphalgo-terraform-go-modules).
-- **LLMjacking with leaked access keys:** the AI guardrails already limited which Bedrock models ran. An opt-in SCP now also denies Bedrock to IAM users, the identity type behind leaked access keys, in [aws-org-guardrails@0d0cd55](https://github.com/DustyStudy/aws-org-guardrails/commit/0d0cd55ac3680206bb82cde9860edd6f809dfd92). Seen in the wild: [FortiGuard Labs, 2026](https://www.fortinet.com/blog/threat-research/someone-else-is-using-your-ai).
 
 ## How the repos fit together
 
