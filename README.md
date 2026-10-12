@@ -52,7 +52,7 @@ flowchart LR
 
 I track AWS attack techniques in active use and update these repos as new ones are reported. Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and public reporting of attackers using it. The most recent:
 
-- **Exposed AI servers hijacked for mining:** the open-ingress playbook already closed SSH, RDP and database ports opened to the internet. It now also closes the LiteLLM and Ollama ports, in [aws-remediation-orchestrator#26](https://github.com/DustyStudy/aws-remediation-orchestrator/pull/26). Seen in the wild: [Lumen Black Lotus Labs, 2026](https://www.lumen.com/blog/en-us/canto-incognito-tracking-the-poellm-malware).
+- **Injected workflows assuming OIDC roles:** the trust-policy auditor already graded missing and wildcard `sub` and `aud` conditions on GitHub OIDC trusts. It now also reports a trust with no workflow pin, in [fedramp-terraform-library v2.1.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v2.1.0). Seen in the wild: [Socket, 2026](https://socket.dev/blog/ghostaction-cloud-credentials).
 
 ## Tools and platforms
 
