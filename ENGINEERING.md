@@ -24,16 +24,16 @@ These are historical results for that revision, not proof of every later change.
 
 ## What the live runs establish
 
-| System | Recorded result | Boundary of the evidence |
+| System | Recorded result | Scope of the run |
 |---|---|---|
 | [Terraform controls](https://github.com/DustyStudy/fedramp-terraform-library/blob/a930ed3042eed2a1c96699e5a481fff8a401274e/docs/LIVE-PROOF.md) | Thirteen modules deployed and probed in a four-account organization, including database, registry and web ACL data paths | The report identifies the exercised modules; it does not establish an authorization or prove every module |
 | [Remediation](https://github.com/DustyStudy/aws-remediation-orchestrator/blob/ff52fb396a076e894835d376ad2ecf95e68b5585/docs/PROOF.md) | Six playbooks changed real resources across the recorded runs; denial and timeout prevented changes | Sandbox verification, not a production availability or throughput claim |
 | [Evidence collection](https://github.com/DustyStudy/grc-evidence-automation/blob/9237efad37af3a77ccc96344aaccceea942e7b57/docs/live-deployment-verification.md) | Thirteen AWS collectors produced records plus a manifest; S3/KMS delivery and downloaded evidence verification were exercised | Same-account run; cross-account assumption, GCP, vendor ingestion and unattended scheduling were outside that run |
 | [Identity broker](https://github.com/DustyStudy/aws-sso-broker/blob/9e4e9336a2b0b4de90faa89b06e61407a3626efb/docs/PROOF.md) | Live Identity Center sign-in, credential use, logout and hardening checks | Local guardrails supplement IAM and SCPs; they do not enforce a server-side security boundary |
 
-The collector and remediation exporter have related evidence formats. A single
-live run connecting every project, including downstream ingestion, has not
-been established by these reports.
+The collector and remediation exporter share related evidence formats. Each
+report covers its own system; an end-to-end run across every project,
+including downstream ingestion, is the next proof to record.
 
 ## Decisions exposed by deployment
 
@@ -57,7 +57,7 @@ remain short-lived and individual API calls succeed.
 makes account count, region count, scan frequency and report retention explicit.
 Those assumptions matter more than an unconditional low-cost claim.
 
-For the orchestration and evidence projects, the next useful measurements are
-end-to-end latency, collection duration, throttling behavior and observed cost
-at stated account/resource counts. The existing reports do not establish those
-numbers, so they are not presented as measured results here.
+For the orchestration and evidence projects, the next measurements to record
+are end-to-end latency, collection duration, throttling behavior and observed
+cost at stated account and resource counts, so performance claims stay tied to
+measured runs.
