@@ -4,7 +4,7 @@
 
 I build multi-account guardrails, audit evidence pipelines, and remediation workflows that run on short-lived credentials only (OIDC and IAM Identity Center, zero long-lived keys).
 
-Every repo below has automated tests (terraform test, pytest), is scanned in CI with Checkov, Trivy, and Gitleaks, and documents its coverage gaps. Where noted, it links to proof from a live deployment.
+Every repo below has automated tests (terraform test, pytest, opa test), is scanned in CI with Checkov, Trivy, and Gitleaks, and documents its coverage gaps. Where noted, it links to proof from a live deployment.
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/dustyarrington/)
 
@@ -27,6 +27,7 @@ flowchart LR
   end
   subgraph detect["Detect"]
     prowler["prowler-aws-template<br/>org-wide CSPM scans"]
+    wiz["wiz-cloud-config-rules<br/>custom Wiz CSPM rules"]
     sh["Security Hub findings"]
   end
   subgraph respond["Respond"]
@@ -47,6 +48,7 @@ flowchart LR
 - [**grc-evidence-automation**](https://github.com/DustyStudy/grc-evidence-automation): scheduled, tamper-evident control evidence for SOC 2, ISO 27001, NIST 800-53 and FedRAMP 20x. [Deployed and verified in a live account](https://github.com/DustyStudy/grc-evidence-automation/blob/main/docs/live-deployment-verification.md).
 - [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit): prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation and a tamper-evident audit log for LLM agents.
 - [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template): org-wide Prowler scans for under $1/month with GitHub Actions, OIDC and StackSet read-only roles. [Run against a real four-account organization](https://github.com/DustyStudy/prowler-aws-template/blob/main/docs/PROOF.md).
+- [**wiz-cloud-config-rules**](https://github.com/DustyStudy/wiz-cloud-config-rules): custom Wiz Cloud Configuration Rules for AWS in Rego, mapped to NIST 800-53, with a Terraform module that loads them into a tenant. Missing data fails instead of passing, and no rule hard-codes the partition, so the rules work in GovCloud. 146 `opa test` cases across nine rules.
 
 ## Threat-informed hardening
 
@@ -58,7 +60,7 @@ I track AWS attack techniques in active use and update these repos as new ones a
 
 **Cloud:** AWS (including GovCloud)<br>
 **Infrastructure as code:** Terraform, GitHub Actions<br>
-**Languages:** Python, HCL, PowerShell, Bash<br>
-**Security tooling:** Checkov, Trivy, Gitleaks, Prowler, Security Hub, GuardDuty, AWS Config<br>
+**Languages:** Python, HCL, Rego, PowerShell, Bash<br>
+**Security tooling:** Checkov, Trivy, Gitleaks, Prowler, Wiz, OPA, Security Hub, GuardDuty, AWS Config<br>
 **Frameworks:** FedRAMP Rev5 and 20x, NIST 800-53 Rev5, SOC 2, ISO 27001:2022<br>
 **AI assistance:** I use AI coding assistants (Claude Code) for drafting and review. I design each system, and I verify it with tests and, where noted, live deployments.
