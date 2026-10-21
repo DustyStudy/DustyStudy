@@ -61,7 +61,7 @@ scope and limits of each live run.
 I connect observed attack techniques to specific controls and regression checks.
 Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and public reporting of attackers using it. The most recent:
 
-- **Service-specific credentials added to compromised IAM users:** the guardrail SCPs already denied new IAM users, access keys and console passwords, and the credential playbook deactivated access keys. An opt-in SCP now denies new Bedrock API keys and other service-specific credentials, in [aws-org-guardrails#26](https://github.com/DustyStudy/aws-org-guardrails/pull/26), and the playbook deactivates existing ones, in [aws-remediation-orchestrator#34](https://github.com/DustyStudy/aws-remediation-orchestrator/pull/34). Seen in the wild: [FortiGuard Labs, 2026](https://www.fortinet.com/blog/threat-research/someone-else-is-using-your-ai).
+- **php2shell remote code execution in PHP:** the remediation orchestrator already isolated EC2 instances on GuardDuty findings. It now routes Amazon Inspector findings by CVE, with approval-required rules that isolate an instance running vulnerable PHP, in [aws-remediation-orchestrator#38](https://github.com/DustyStudy/aws-remediation-orchestrator/pull/38). Seen in the wild: [Cloudflare, 2026](https://blog.cloudflare.com/php-vulnerabilities-waf-protection).
 
 ## Tools and platforms
 
