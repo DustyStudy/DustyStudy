@@ -60,9 +60,9 @@ scope and limits of each live run.
 ## Threat-informed hardening
 
 I connect observed attack techniques to specific controls and regression checks.
-Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and public reporting of attackers using it. The most recent:
+Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and any public reporting of attackers using it. The most recent:
 
-- **Backdoored LiteLLM release stealing instance-role credentials:** aws-org-guardrails already required IMDSv2 at launch, which a container on the instance can still use. An opt-in SCP now requires an IMDS hop limit of 1, so containers on bridge networks cannot fetch the instance role's credentials, in [aws-org-guardrails#29](https://github.com/DustyStudy/aws-org-guardrails/pull/29). Seen in the wild: [StepSecurity, 2026](https://www.stepsecurity.io/blog/litellm-1-107-0-compromised-pypi-backdoored-wheels-credential-stealer).
+- **Look-alike SageMaker default bucket swapping training code (CVE-2026-112408):** aws-org-guardrails already covered Bedrock logging and access and SageMaker notebook settings. An opt-in SCP now denies object reads and writes on SageMaker default-bucket names owned outside the organization, in [aws-org-guardrails#33](https://github.com/DustyStudy/aws-org-guardrails/pull/33). Seen in the wild: no public report yet; disclosed in [AWS bulletin 2026-142-AWS](https://aws.amazon.com/security/security-bulletins/2026-142-aws/).
 
 ## Tools and platforms
 
