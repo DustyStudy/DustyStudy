@@ -62,7 +62,7 @@ scope and limits of each live run.
 I connect observed attack techniques to specific controls and regression checks.
 Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and any public reporting of attackers using it. The most recent:
 
-- **Look-alike SageMaker default bucket swapping training code (CVE-2026-112408):** aws-org-guardrails already covered Bedrock logging and access and SageMaker notebook settings. An opt-in SCP now denies object reads and writes on SageMaker default-bucket names owned outside the organization, in [aws-org-guardrails#33](https://github.com/DustyStudy/aws-org-guardrails/pull/33). Seen in the wild: no public report yet; disclosed in [AWS bulletin 2026-142-AWS](https://aws.amazon.com/security/security-bulletins/2026-142-aws/).
+- **Redirecting Bedrock invocation logging to hide model abuse:** aws-org-guardrails already denied deleting Bedrock invocation logging and Guardrails, and restored logging when it was removed. An opt-in SCP statement now denies `PutModelInvocationLoggingConfiguration` to every role outside a listed set of logging admins, in [aws-org-guardrails#36](https://github.com/DustyStudy/aws-org-guardrails/pull/36). Seen in the wild: [Sysdig, 2024](https://www.sysdig.com/blog/growing-dangers-of-llmjacking).
 
 ## Tools and platforms
 
