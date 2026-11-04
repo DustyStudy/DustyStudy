@@ -10,6 +10,12 @@ Severity rates the technique itself: what an attacker gains when it works agains
 
 Newest first.
 
+## 2026-11
+
+| Date | Technique | Severity | Seen in the wild | Coverage before | Change |
+|------|-----------|----------|------------------|-----------------|--------|
+| 2026-11-03 | Credentials taken from a developer's laptop used against KMS signing and decryption keys from outside the organization's network ([T1078.004](https://attack.mitre.org/techniques/T1078/004/)) | High | [CoinDesk, 2026: Binance said its $6.3 billion hot-wallet theft began with a fake job interview](https://www.coindesk.com/business/2026/11/03/binance-s-usd6-3-billion-hack-began-with-a-fake-job-interview-exchange-says). The reporting covers the laptop compromise and the wallet theft; I found no public report saying AWS KMS keys were involved. | The SCP bundles restricted Regions and protected security tooling, Identity Center sessions defaulted to one hour, and the orchestrator could revoke stolen role sessions. Nothing tied use of a KMS key to the network a call came from. | [aws-org-guardrails#41](https://github.com/DustyStudy/aws-org-guardrails/pull/41): opt-in SCP statement denying signing, decrypting, grants, replication, key-policy and tag changes on KMS keys tagged `guardrails:network-perimeter=true` unless the call comes through a VPC endpoint owned by the organization. It does not cover data read through other services, such as SSE-KMS objects in S3 |
+
 ## 2026-10
 
 | Date | Technique | Severity | Seen in the wild | Coverage before | Change |

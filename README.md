@@ -62,7 +62,7 @@ scope and limits of each live run.
 I connect observed attack techniques to specific controls and regression checks.
 Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and any public reporting of attackers using it. The most recent:
 
-- **Redirecting Bedrock invocation logging to hide model abuse:** aws-org-guardrails already denied deleting Bedrock invocation logging and Guardrails, and restored logging when it was removed. An opt-in SCP statement now denies `PutModelInvocationLoggingConfiguration` to every role outside a listed set of logging admins, in [aws-org-guardrails#36](https://github.com/DustyStudy/aws-org-guardrails/pull/36). Seen in the wild: [Sysdig, 2024](https://www.sysdig.com/blog/growing-dangers-of-llmjacking).
+- **Using stolen laptop credentials against signing keys from outside the network:** the repos already restricted Regions, kept Identity Center sessions short, and could revoke stolen role sessions. An opt-in SCP statement now denies signing, decrypting and re-granting tagged KMS keys unless the call comes through an organization VPC endpoint, in [aws-org-guardrails#41](https://github.com/DustyStudy/aws-org-guardrails/pull/41). Seen in the wild: [CoinDesk, 2026](https://www.coindesk.com/business/2026/11/03/binance-s-usd6-3-billion-hack-began-with-a-fake-job-interview-exchange-says).
 
 ## Tools and platforms
 
