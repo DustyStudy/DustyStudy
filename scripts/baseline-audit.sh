@@ -9,8 +9,8 @@
 # The report is posted to a public repo, so private repos are counted but
 # not named. SHOW_PRIVATE=1 names them too, for a local run.
 #
-# The token needs read access to every repo: Administration (read),
-# Contents (read), Metadata (read). GITHUB_TOKEN cannot see other repos'
+# The token needs read access to every repo: Actions (read), Administration
+# (read), Contents (read), Metadata (read). GITHUB_TOKEN cannot see other repos'
 # settings, so the weekly workflow uses a PAT stored as BASELINE_AUDIT_TOKEN.
 #
 # Fix a drifting repo with: scripts/repo-baseline.sh <repo>
@@ -58,6 +58,8 @@ for name in $repos; do
     [ "$pp" = enabled ] || gaps+=("push protection $pp")
   fi
 
+  [ "$(jq -r .has_wiki <<<"$meta")" = false ] || gaps+=("wiki on")
+
   ok "$R/vulnerability-alerts" || gaps+=("Dependabot alerts off")
   dsu=$(get false "$R/automated-security-fixes" --jq .enabled)
   [ "$dsu" = true ] || gaps+=("Dependabot security updates off")
@@ -72,6 +74,12 @@ for name in $repos; do
   # changes nothing (the template still ships one).
   if ok "$R/contents/.github/workflows"; then
     ok "$R/contents/.github/dependabot.yml" || gaps+=("no .github/dependabot.yml")
+    # GitHub turns off a public repo's scheduled workflows after 60 days with
+    # no commits, so the weekly scans stop without failing anything.
+    off=$(get "?" "$R/actions/workflows" --paginate \
+      --jq '[.workflows[] | select(.state == "disabled_inactivity") | .name] | join(", ")')
+    if [ "$off" = "?" ]; then gaps+=("can't list workflows (token needs Actions: read)")
+    elif [ -n "$off" ]; then gaps+=("disabled for inactivity: $off"); fi
   fi
 
   if [ ${#gaps[@]} -gt 0 ]; then

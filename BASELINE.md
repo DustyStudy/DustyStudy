@@ -31,9 +31,9 @@ Also keep two-factor authentication on for the account.
 The audit reads other repos' settings, which the built-in `GITHUB_TOKEN`
 cannot do. Create a
 [fine-grained token](https://github.com/settings/personal-access-tokens/new)
-for **All repositories** with read-only **Administration**, **Contents** and
-**Metadata**, then store it as the `BASELINE_AUDIT_TOKEN` secret on this
-repo. Set an expiry and renew it; the audit fails loudly when it lapses.
+for **All repositories** with read-only **Actions**, **Administration**,
+**Contents** and **Metadata**, then store it as the `BASELINE_AUDIT_TOKEN`
+secret on this repo. Set an expiry and renew it; the audit fails loudly when it lapses.
 
 ## Opting a repo into the shared workflows
 

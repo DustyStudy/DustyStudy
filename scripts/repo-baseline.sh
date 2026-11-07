@@ -40,6 +40,11 @@ api -X PATCH "$R" --silent \
   -F delete_branch_on_merge=true
 echo "merge settings: squash only, delete merged branches"
 
+# --- Wiki off: a public repo's wiki is editable by any GitHub user by default.
+# Turning it off hides the pages but keeps them; re-enable it by hand if used.
+api -X PATCH "$R" --silent -F has_wiki=false
+echo "wiki: off"
+
 # --- Security features. Secret scanning on a private repo needs GitHub
 # Advanced Security, so it is only turned on for public ones.
 api -X PUT "$R/vulnerability-alerts" --silent
