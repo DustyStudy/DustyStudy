@@ -1,0 +1,58 @@
+name: SAST (reusable)
+
+# Semgrep static analysis. Secret scanning lives in security-scan.yml
+# (Gitleaks over full history) plus GitHub push protection, so call both.
+#
+#   jobs:
+#     sast:
+#       uses: DustyStudy/DustyStudy/.github/workflows/sast.yml@<sha>
+#       permissions:
+#         contents: read
+#         security-events: write
+#         actions: read
+
+on:
+  workflow_call:
+    inputs:
+      config:
+        description: Semgrep rule packs, space-separated.
+        type: string
+        default: "p/default p/secrets"
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    # Image pinned by digest, same as a pinned action SHA.
+    container:
+      image: semgrep/semgrep:1.184.0@sha256:cc1b68266f267878b39739373ea9985b9a78e5d64497dd875c8de100b22695ed
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run Semgrep
+        env:
+          RULES: ${{ inputs.config }}
+        run: |
+          args=""
+          for c in $RULES; do args="$args --config $c"; done
+          # shellcheck disable=SC2086
+          semgrep scan $args --metrics=off --sarif --output semgrep.sarif --error
+
+      # Code scanning needs a public repo (or GitHub Advanced Security).
+      - name: Upload results to the Security tab
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        if: always() && hashFiles('semgrep.sarif') != '' && !github.event.repository.private
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep

@@ -1,0 +1,168 @@
+name: Terraform CI (reusable)
+
+# fmt, validate, Checkov and an optional read-only plan. This workflow never
+# runs `terraform apply` or `-auto-approve`; applies stay in each repo's own
+# deploy workflow behind its own approvals.
+#
+#   jobs:
+#     terraform:
+#       uses: DustyStudy/DustyStudy/.github/workflows/terraform-ci.yml@<sha>
+#       permissions:
+#         contents: read
+#         id-token: write   # only needed when plan-role-arn is set
+#       with:
+#         working-directory: terraform
+#         plan-role-arn: ${{ vars.AWS_PLAN_ROLE_ARN }}
+#         aws-region: us-east-1
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Directory holding the Terraform root module.
+        type: string
+        default: "."
+      terraform-version:
+        description: Terraform CLI version.
+        type: string
+        default: "1.15.8"
+      plan-role-arn:
+        description: >-
+          IAM role ARN to assume over OIDC for `terraform plan`. The partition
+          (arn:aws or arn:aws-us-gov) comes from this ARN. Empty skips the plan.
+        type: string
+        default: ""
+      aws-region:
+        description: AWS region for the plan. GovCloud roles allow only us-gov-west-1 and us-gov-east-1.
+        type: string
+        default: "us-east-1"
+      checkov:
+        description: Run Checkov on the module. Turn off if the caller already runs it.
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Terraform fmt and validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: ${{ inputs.terraform-version }}
+          terraform_wrapper: false
+
+      - name: terraform fmt
+        run: terraform fmt -check -recursive -diff
+
+      - name: terraform validate
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+
+  checkov:
+    name: Terraform misconfiguration (Checkov)
+    if: inputs.checkov
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run Checkov (blocking)
+        uses: bridgecrewio/checkov-action@c3e106d5f8f4253a6de5110efb41a080f83db294 # v12.3135.0
+        with:
+          directory: ${{ inputs.working-directory }}
+          framework: terraform
+          quiet: true
+          soft_fail: false
+
+  plan:
+    name: Terraform plan (read-only)
+    if: inputs.plan-role-arn != ''
+    needs: static
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: Check partition and region
+        env:
+          ROLE_ARN: ${{ inputs.plan-role-arn }}
+          REGION: ${{ inputs.aws-region }}
+        working-directory: .
+        run: |
+          partition=$(cut -d: -f2 <<<"$ROLE_ARN")
+          case "$partition" in
+            aws-us-gov)
+              case "$REGION" in us-gov-west-1|us-gov-east-1) ;; *)
+                echo "::error::GovCloud role needs region us-gov-west-1 or us-gov-east-1, got $REGION"; exit 1;; esac ;;
+            aws)
+              case "$REGION" in us-gov-*)
+                echo "::error::Commercial role cannot use GovCloud region $REGION"; exit 1;; esac ;;
+            *) echo "::error::Unsupported partition '$partition' in plan-role-arn"; exit 1 ;;
+          esac
+          echo "AWS_PARTITION=$partition" >> "$GITHUB_ENV"
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: ${{ inputs.terraform-version }}
+          terraform_wrapper: false
+
+      # OIDC only: no access keys exist anywhere in this workflow.
+      - name: Assume plan role (OIDC)
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ inputs.plan-role-arn }}
+          aws-region: ${{ inputs.aws-region }}
+          role-session-name: tf-plan-${{ github.run_id }}
+
+      - name: terraform plan
+        env:
+          TF_VAR_aws_partition: ${{ env.AWS_PARTITION }}
+        run: |
+          terraform init -input=false
+          terraform plan -input=false -lock-timeout=5m -no-color
