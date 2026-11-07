@@ -62,7 +62,7 @@ scope and limits of each live run.
 I connect observed attack techniques to specific controls and regression checks.
 Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and any public reporting of attackers using it. The most recent:
 
-- **Using stolen laptop credentials against signing keys from outside the network:** the repos already restricted Regions, kept Identity Center sessions short, and could revoke stolen role sessions. An opt-in SCP statement now denies signing, decrypting and re-granting tagged KMS keys unless the call comes through an organization VPC endpoint, in [aws-org-guardrails#41](https://github.com/DustyStudy/aws-org-guardrails/pull/41). Seen in the wild: [CoinDesk, 2026](https://www.coindesk.com/business/2026/11/03/binance-s-usd6-3-billion-hack-began-with-a-fake-job-interview-exchange-says).
+- **Secrets saved by a coding agent's "don't ask again":** the repos already blocked edits that write keys and tokens, but nothing read Claude Code's own settings files, where an approved command is saved with its secret. A mod now warns at session start when a permission rule holds a literal secret or `settings.local.json` would be committed, in [claude-code-guardrails#38](https://github.com/DustyStudy/claude-code-guardrails/pull/38). Reported: [Lakera, 2026](https://nhimg.org/articles/claude-code-leaks-api-keys-through-published-package-files/), secrets exposed in published packages; no report found of attackers using this file.
 
 ## Tools and platforms
 
