@@ -73,6 +73,13 @@ checks=$(gh api "$R/commits/$sha/check-runs?per_page=100" --jq \
   "[.check_runs[] | select(.app.slug == \"github-actions\" and .conclusion == \"success\") | .name | select(test(\"$scan_re\"))]")
 checks=$(jq -c -n --argjson a "$checks" '$ARGS.positional + $a | unique' --args "$@")
 
+# --- Private repos on GitHub Free can't have rulesets or branch protection.
+# Stop cleanly instead of failing on the 403; everything above still applied.
+if [ "$private" = true ] && ! gh api "$R/rulesets" >/dev/null 2>&1; then
+  echo "branch protection: skipped (private repo; needs GitHub Pro)"
+  exit 0
+fi
+
 # --- Branch protection. A repo that already uses classic protection keeps
 # it (its settings and checks stay; the new checks are added). Anything
 # else gets a "Protect main" ruleset. Either way a PR must be up to date
