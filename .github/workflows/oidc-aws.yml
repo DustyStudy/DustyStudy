@@ -20,9 +20,20 @@ name: AWS OIDC check (reusable)
 #   "Principal": {"Federated": "arn:${Partition}:iam::${Account}:oidc-provider/token.actions.githubusercontent.com"},
 #   "Action": "sts:AssumeRoleWithWebIdentity",
 #   "Condition": {
-#     "StringEquals": {"token.actions.githubusercontent.com:aud": "sts.amazonaws.com"},
-#     "StringLike":   {"token.actions.githubusercontent.com:sub": "repo:DustyStudy/<repo>:ref:refs/heads/main"}
+#     "StringEquals": {
+#       "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+#       "token.actions.githubusercontent.com:sub": "repo:DustyStudy/<repo>:ref:refs/heads/main"
+#     }
 #   }
+#
+# Use StringEquals, not StringLike: there is no wildcard to match. A job
+# run by a pull request presents
+# sub = repo:DustyStudy/<repo>:pull_request instead, so a role that runs
+# `terraform plan` on PRs (terraform-ci.yml) must list that value too:
+#   "token.actions.githubusercontent.com:sub": ["repo:DustyStudy/<repo>:ref:refs/heads/main", "repo:DustyStudy/<repo>:pull_request"]
+# Keep that role read-only: the PR's Terraform code runs with its
+# credentials. In a public repo the plan output is in public Actions logs,
+# so run plans for real infrastructure from a private repo.
 
 on:
   workflow_call:
@@ -62,7 +73,9 @@ jobs:
           case "$partition" in
             aws-us-gov)
               case "$REGION" in us-gov-west-1|us-gov-east-1) ;; *)
-                echo "::error::GovCloud role needs region us-gov-west-1 or us-gov-east-1, got $REGION"; exit 1;; esac ;;
+                echo "::error::GovCloud role needs region us-gov-west-1 or us-gov-east-1, got $REGION"; exit 1;; esac
+              # STS (credentials action) and the AWS CLI both read this.
+              echo "AWS_USE_FIPS_ENDPOINT=true" >> "$GITHUB_ENV" ;;
             aws)
               case "$REGION" in us-gov-*)
                 echo "::error::Commercial role cannot use GovCloud region $REGION"; exit 1;; esac ;;

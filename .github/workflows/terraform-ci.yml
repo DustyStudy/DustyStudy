@@ -133,7 +133,9 @@ jobs:
           case "$partition" in
             aws-us-gov)
               case "$REGION" in us-gov-west-1|us-gov-east-1) ;; *)
-                echo "::error::GovCloud role needs region us-gov-west-1 or us-gov-east-1, got $REGION"; exit 1;; esac ;;
+                echo "::error::GovCloud role needs region us-gov-west-1 or us-gov-east-1, got $REGION"; exit 1;; esac
+              # STS (credentials action) and the Terraform AWS provider both read this.
+              echo "AWS_USE_FIPS_ENDPOINT=true" >> "$GITHUB_ENV" ;;
             aws)
               case "$REGION" in us-gov-*)
                 echo "::error::Commercial role cannot use GovCloud region $REGION"; exit 1;; esac ;;

@@ -60,7 +60,7 @@ jobs:
           cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
           case $status in
             0) echo "drift=false" >> "$GITHUB_OUTPUT" ;;
-            1) echo "drift=true" >> "$GITHUB_OUTPUT" ;;
+            2) echo "drift=true" >> "$GITHUB_OUTPUT" ;;
             *) echo "::error::audit script failed"; exit "$status" ;;
           esac
 
