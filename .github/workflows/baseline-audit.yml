@@ -1,0 +1,88 @@
+name: Repo baseline audit
+
+# Weekly read-only check of every repo on this account against the repo
+# baseline. Opens (or updates) one issue labelled baseline-drift listing
+# the gaps, and closes it once every repo is clean. It never changes a
+# repo's settings; fixing is scripts/repo-baseline.sh, run by hand.
+#
+# Needs the secret BASELINE_AUDIT_TOKEN: a fine-grained PAT scoped to all
+# repos with read-only Administration, Contents and Metadata.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Audit repos
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check the audit token is set
+        env:
+          HAS_TOKEN: ${{ secrets.BASELINE_AUDIT_TOKEN != '' }}
+        run: |
+          if [ "$HAS_TOKEN" != true ]; then
+            echo "::error::Add a BASELINE_AUDIT_TOKEN secret (fine-grained PAT, read-only Administration/Contents/Metadata on all repos)."
+            exit 1
+          fi
+
+      - name: Run audit
+        id: audit
+        env:
+          GH_TOKEN: ${{ secrets.BASELINE_AUDIT_TOKEN }}
+        run: |
+          set +e
+          bash scripts/baseline-audit.sh > "$RUNNER_TEMP/report.md"
+          status=$?
+          set -e
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+          case $status in
+            0) echo "drift=false" >> "$GITHUB_OUTPUT" ;;
+            1) echo "drift=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::audit script failed"; exit "$status" ;;
+          esac
+
+      # Issues are written with the built-in token, scoped to this repo only.
+      - name: Open, update or close the drift issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRIFT: ${{ steps.audit.outputs.drift }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh label create baseline-drift --repo "$REPO" --color B60205 \
+            --description "Repos drifting from the security baseline" 2>/dev/null || true
+          num=$(gh issue list --repo "$REPO" --label baseline-drift --state open --json number --jq '.[0].number // empty')
+          if [ "$DRIFT" = true ]; then
+            if [ -n "$num" ]; then
+              gh issue edit "$num" --repo "$REPO" --body-file "$RUNNER_TEMP/report.md"
+              gh issue comment "$num" --repo "$REPO" --body "Re-checked on $(date -u +%F); report above is current."
+            else
+              gh issue create --repo "$REPO" --label baseline-drift \
+                --title "Repos drifting from the security baseline" --body-file "$RUNNER_TEMP/report.md"
+            fi
+          elif [ -n "$num" ]; then
+            gh issue close "$num" --repo "$REPO" --reason completed \
+              --comment "Every repo matches the baseline as of $(date -u +%F)."
+          fi
