@@ -5,7 +5,7 @@
 #   DRY_RUN=1 scripts/repo-baseline.sh <repo>     # print the writes only
 #
 # Pass the repo's own CI jobs (tests, lint, CodeQL) as extra required checks;
-# only the security-scan jobs are picked up automatically. Use the names a
+# only the shared security-scan and sast jobs are picked up automatically. Use the names a
 # pull request reports, not push-only jobs such as a release.
 #
 # Run it after creating a repo, and again after the repo's first CI run on
@@ -64,11 +64,11 @@ api -X PUT "$R/actions/permissions/workflow" --silent \
   -f default_workflow_permissions=read -F can_approve_pull_request_reviews="$can_approve"
 echo "actions: SHA pinning required, default token read-only"
 
-# --- Required checks: the security-scan jobs (shared workflow, the hub's
+# --- Required checks: the security-scan and sast jobs (shared workflows, the hub's
 # self-call, or a local copy) that last passed on the default branch, plus
 # any passed as arguments.
 sha=$(gh api "$R/commits/$branch" --jq .sha)
-scan_re='^((Security )?scan / )?(Secrets [(]Gitleaks[)]|Vulnerabilities and misconfiguration [(]Trivy[)]|Workflow security [(]zizmor[)]|Misconfiguration [(]Checkov[)])$'
+scan_re='^(((Security )?scan|sast) / )?(Secrets [(]Gitleaks[)]|Vulnerabilities and misconfiguration [(]Trivy[)]|Workflow security [(]zizmor[)]|Misconfiguration [(]Checkov[)]|SAST [(]Semgrep[)])$'
 checks=$(gh api "$R/commits/$sha/check-runs?per_page=100" --jq \
   "[.check_runs[] | select(.app.slug == \"github-actions\" and .conclusion == \"success\") | .name | select(test(\"$scan_re\"))]")
 checks=$(jq -c -n --argjson a "$checks" '$ARGS.positional + $a | unique' --args "$@")
