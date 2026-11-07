@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 # Read-only check of every DustyStudy repo against the repo baseline that
 # scripts/repo-baseline.sh applies. Makes no changes; prints a Markdown
-# report of drift to stdout and exits 1 when any repo drifts.
+# report of drift to stdout. Exits 0 when clean, 2 when any repo drifts,
+# and anything else (1 from set -e) when the audit itself fails.
 #
 #   GH_TOKEN=<fine-grained PAT> scripts/baseline-audit.sh > report.md
+#
+# The report is posted to a public repo, so private repos are counted but
+# not named. SHOW_PRIVATE=1 names them too, for a local run.
 #
 # The token needs read access to every repo: Administration (read),
 # Contents (read), Metadata (read). GITHUB_TOKEN cannot see other repos'
@@ -24,6 +28,7 @@ repos=${REPOS:-$(gh api --paginate "user/repos?affiliation=owner&per_page=100" \
   --jq ".[] | select(.owner.login == \"$OWNER\" and (.archived | not) and (.fork | not)) | .name" | sort)}
 
 drift=0
+private_drift=0
 rows=""
 for name in $repos; do
   R=repos/$OWNER/$name
@@ -71,6 +76,10 @@ for name in $repos; do
 
   if [ ${#gaps[@]} -gt 0 ]; then
     drift=$((drift + 1))
+    if [ "$private" = true ] && [ -z "${SHOW_PRIVATE:-}" ]; then
+      private_drift=$((private_drift + 1))
+      continue
+    fi
     vis=$([ "$private" = true ] && echo private || echo public)
     joined=$(printf '%s; ' "${gaps[@]}")
     rows+="| [$name](https://github.com/$OWNER/$name) | $vis | ${joined%; } |"$'\n'
@@ -83,10 +92,16 @@ echo
 echo "Checked $total repos; $drift drift from the baseline."
 echo
 if [ "$drift" -gt 0 ]; then
-  echo "| Repo | Visibility | Gaps |"
-  echo "|---|---|---|"
-  printf '%s' "$rows"
-  echo
+  if [ -n "$rows" ]; then
+    echo "| Repo | Visibility | Gaps |"
+    echo "|---|---|---|"
+    printf '%s' "$rows"
+    echo
+  fi
+  if [ "$private_drift" -gt 0 ]; then
+    echo "$private_drift private repo(s) also drift; they are not named here. Run \`SHOW_PRIVATE=1 scripts/baseline-audit.sh\` locally to list them."
+    echo
+  fi
   echo "Fix one repo with \`scripts/repo-baseline.sh <repo>\` (try \`DRY_RUN=1\` first). Private repos are not checked for branch rules or secret scanning: GitHub Free doesn't offer them on private repos."
-  exit 1
+  exit 2
 fi
