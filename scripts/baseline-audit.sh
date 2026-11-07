@@ -62,8 +62,12 @@ for name in $repos; do
   tok=$(get unknown "$R/actions/permissions/workflow" --jq .default_workflow_permissions)
   [ "$tok" = read ] || gaps+=("default GITHUB_TOKEN is $tok")
 
-  ok "$R/contents/.github/dependabot.yml" || gaps+=("no .github/dependabot.yml")
-  { ok "$R/contents/.github/CODEOWNERS" || ok "$R/contents/CODEOWNERS"; } || gaps+=("no CODEOWNERS")
+  # Dependabot keeps action SHA pins current, so it's only needed where
+  # there are workflows. CODEOWNERS isn't checked: with one maintainer it
+  # changes nothing (the template still ships one).
+  if ok "$R/contents/.github/workflows"; then
+    ok "$R/contents/.github/dependabot.yml" || gaps+=("no .github/dependabot.yml")
+  fi
 
   if [ ${#gaps[@]} -gt 0 ]; then
     drift=$((drift + 1))
