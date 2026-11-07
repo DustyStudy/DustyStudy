@@ -9,5 +9,7 @@
 ^https://socket\.dev/
 # CoinDesk rate-limits automated requests from CI (HTTP 429).
 ^https://www\.coindesk\.com/
+# NHI Mgmt Group blocks automated requests from CI (HTTP 403).
+^https://nhimg\.org/
 # Account settings pages need a signed-in session (redirect to login).
 ^https://github\.com/settings/
