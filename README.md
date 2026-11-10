@@ -62,7 +62,7 @@ scope and limits of each live run.
 I connect observed attack techniques to specific controls and regression checks.
 Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and any public reporting of attackers using it. The most recent:
 
-- **Secrets saved by a coding agent's "don't ask again":** the repos already blocked edits that write keys and tokens, but nothing read Claude Code's own settings files, where an approved command is saved with its secret. A mod now warns at session start when a permission rule holds a literal secret or `settings.local.json` would be committed, in [claude-code-guardrails#38](https://github.com/DustyStudy/claude-code-guardrails/pull/38). Reported: [Lakera, 2026](https://nhimg.org/articles/claude-code-leaks-api-keys-through-published-package-files/), secrets exposed in published packages; no report found of attackers using this file.
+- **AWS credentials held by an AI vendor:** the repos already blocked creating new IAM user keys and flagged vendor trusts with no external ID, but nothing limited where a credential a vendor already held could be used from. An opt-in SCP now denies a listed vendor's roles and users access from outside the source ranges it publishes, in [aws-org-guardrails#44](https://github.com/DustyStudy/aws-org-guardrails/pull/44). Reported: [Fireworks AI, 2026](https://fireworks.ai/security/bulletins/october-2026-security-incident-update), customer secrets stolen in a breach of the vendor; Fireworks publishes no source ranges, so this control could not have covered it.
 
 ## Tools and platforms
 
