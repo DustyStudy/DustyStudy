@@ -62,7 +62,7 @@ scope and limits of each live run.
 I connect observed attack techniques to specific controls and regression checks.
 Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and any public reporting of attackers using it. The most recent:
 
-- **Brotli decoder bundled in an application binary:** the gateway image was scanned on push, but that scan reads OS packages and can't see the Bun runtime compiled into the `claude` binary, which carries its own Brotli decoder. The gateway build now fails when that runtime predates the fix for CVE-2026-111497, in [aws-org-guardrails#45](https://github.com/DustyStudy/aws-org-guardrails/pull/45). Reported: [Red Hat, 2026](https://access.redhat.com/security/cve/CVE-2026-111497), an out-of-bounds write reachable with a crafted stream; reports disagree on whether it has been exploited.
+- **EC2 termination protection used against responders:** attackers mining with stolen IAM credentials turned on termination protection so their instances couldn't be deleted until someone switched it off, and nothing in the guardrails limited who could change it. An opt-in SCP now denies changing termination or stop protection except to exempt roles, confirmed against live AWS, in [aws-org-guardrails#46](https://github.com/DustyStudy/aws-org-guardrails/pull/46). Reported: [Amazon, 2025](https://aws.amazon.com/blogs/security/cryptomining-campaign-targeting-amazon-ec2-and-amazon-ecs/), a cryptomining campaign on EC2 and ECS.
 
 ## Tools and platforms
 
