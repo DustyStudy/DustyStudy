@@ -62,7 +62,7 @@ scope and limits of each live run.
 I connect observed attack techniques to specific controls and regression checks.
 Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and any public reporting of attackers using it. The most recent:
 
-- **A vendor's AWS account used against its customers:** the trust-policy auditor treated a vendor role with an External ID as clean, but an attacker holding the vendor's own credentials has that ID too. The auditor now reports vendor trusts that are open to any network, trust the whole account, or have gone unused, in [fedramp-terraform-library#69](https://github.com/DustyStudy/fedramp-terraform-library/pull/69). Reported: [Wiz, 2026](https://www.wiz.io/blog/qubole-cross-account-access-abused-in-the-wild), Qubole's AWS account used to assume mostly unused customer roles, read their secrets and copy S3 data.
+- **Brotli decoder bundled in an application binary:** the gateway image was scanned on push, but that scan reads OS packages and can't see the Bun runtime compiled into the `claude` binary, which carries its own Brotli decoder. The gateway build now fails when that runtime predates the fix for CVE-2026-111497, in [aws-org-guardrails#45](https://github.com/DustyStudy/aws-org-guardrails/pull/45). Reported: [Red Hat, 2026](https://access.redhat.com/security/cve/CVE-2026-111497), an out-of-bounds write reachable with a crafted stream; reports disagree on whether it has been exploited.
 
 ## Tools and platforms
 
