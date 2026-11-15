@@ -16,8 +16,6 @@ When a new AWS attack technique shows up in incident reports, I trace it to a co
 | A breached vendor's AWS account assumes the roles customers created for it, with the correct External ID, then reads secrets and copies S3 data ([T1199](https://attack.mitre.org/techniques/T1199/), [T1530](https://attack.mitre.org/techniques/T1530/)) | `trust-policy-auditor` flags outside-org trust with no source-IP or VPC-endpoint condition, whole-account trust, and unused vendor roles: [fedramp-terraform-library#69](https://github.com/DustyStudy/fedramp-terraform-library/pull/69) |
 | Privilege escalation through a single IAM action ([T1098.003](https://attack.mitre.org/techniques/T1098/003/)) | Escalation-action check in `identity-center-access-auditor`: [fedramp-terraform-library v1.2.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v1.2.0) |
 
-Run against a real organization, the read-only trust-policy auditor found a GitHub OIDC deploy role that any branch could assume.
-
 ## Start here
 
 - [**aws-org-guardrails**](https://github.com/DustyStudy/aws-org-guardrails): stops privilege escalation, persistence and log tampering across an AWS Organization with SCPs, a permissions boundary, Identity Center permission sets and Bedrock/SageMaker guardrails. [Probed with 62 live probes](https://github.com/DustyStudy/aws-org-guardrails/blob/main/docs/PROOF.md).
@@ -51,7 +49,7 @@ flowchart LR
 
 ## More projects
 
-- [**fedramp-terraform-library**](https://github.com/DustyStudy/fedramp-terraform-library): 23 hardened AWS account baseline modules and read-only auditors, with plan-time tests of the rendered IAM and bucket policies. [Sixteen deployed and probed in a real organization](https://github.com/DustyStudy/fedramp-terraform-library/blob/main/docs/LIVE-PROOF.md). Mapped to NIST 800-53 Rev5 and FedRAMP.
+- [**fedramp-terraform-library**](https://github.com/DustyStudy/fedramp-terraform-library): 23 hardened AWS account baseline modules and read-only auditors, with plan-time tests of the rendered IAM and bucket policies. [Sixteen deployed and probed in a real organization](https://github.com/DustyStudy/fedramp-terraform-library/blob/main/docs/LIVE-PROOF.md), where the read-only trust-policy auditor found a GitHub OIDC deploy role that any branch could assume. Mapped to NIST 800-53 Rev5 and FedRAMP.
 - [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker): short-lived IAM Identity Center credentials across many accounts, so there are no long-lived access keys to steal. [Tested against a real Identity Center instance](https://github.com/DustyStudy/aws-sso-broker/blob/main/docs/PROOF.md).
 - [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template): org-wide Prowler scans through GitHub Actions and OIDC, with a [documented cost model](https://github.com/DustyStudy/prowler-aws-template/blob/main/docs/COST.md). [Run against a real four-account organization](https://github.com/DustyStudy/prowler-aws-template/blob/main/docs/PROOF.md).
 - [**wiz-cloud-config-rules**](https://github.com/DustyStudy/wiz-cloud-config-rules): custom Wiz Cloud Configuration Rules in Rego, GovCloud-safe, with 162 `opa test` cases.
