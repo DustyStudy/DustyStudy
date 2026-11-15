@@ -1,18 +1,28 @@
 # Dustin Arrington
 
-**Senior Cloud Engineer** focused on AWS multi-account governance and compliance-as-code: FedRAMP (Rev5 and 20x) and NIST 800-53 controls implemented as code on AWS, in both commercial regions and GovCloud.
+I build AWS defenses against the techniques attackers actually use: stolen and over-trusted credentials, privilege escalation, persistence and resource hijacking. Then I try to break them.
 
-I build multi-account guardrails, audit evidence pipelines, and remediation workflows that run on short-lived credentials only (OIDC and IAM Identity Center, zero long-lived keys).
-
-The projects use automated tests (Terraform, Python and Rego), CI security scans appropriate to their code, and documented coverage gaps. Where noted, it links to proof from a live deployment.
+Every control here is tested as policy behavior in CI, and most have been probed against a live four-account AWS organization. Each repo documents what was tested and what was not.
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/dustyarrington/)
 
+## Threat-informed hardening
+
+When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 29 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
+
+| Technique | What I shipped |
+|---|---|
+| Attackers mining with stolen IAM credentials turn on EC2 termination protection so responders can't delete their instances ([T1078.004](https://attack.mitre.org/techniques/T1078/004/)) | Opt-in SCP that denies changing termination or stop protection except to exempt roles, confirmed against live AWS: [aws-org-guardrails#46](https://github.com/DustyStudy/aws-org-guardrails/pull/46) |
+| A breached vendor's AWS account assumes the roles customers created for it, with the correct External ID, then reads secrets and copies S3 data ([T1199](https://attack.mitre.org/techniques/T1199/), [T1530](https://attack.mitre.org/techniques/T1530/)) | `trust-policy-auditor` flags outside-org trust with no source-IP or VPC-endpoint condition, whole-account trust, and unused vendor roles: [fedramp-terraform-library#69](https://github.com/DustyStudy/fedramp-terraform-library/pull/69) |
+| Privilege escalation through a single IAM action ([T1098.003](https://attack.mitre.org/techniques/T1098/003/)) | Escalation-action check in `identity-center-access-auditor`: [fedramp-terraform-library v1.2.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v1.2.0) |
+
+Run against a real organization, the read-only trust-policy auditor found a GitHub OIDC deploy role that any branch could assume.
+
 ## Start here
 
-- [**fedramp-terraform-library**](https://github.com/DustyStudy/fedramp-terraform-library): NIST 800-53 Rev5 and FedRAMP 20x controls as Terraform modules, with plan-time policy tests. [Sixteen of its 23 modules deployed and probed in a real organization](https://github.com/DustyStudy/fedramp-terraform-library/blob/main/docs/LIVE-PROOF.md).
-- [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator): Security Hub findings routed through policy, blast-radius limits and a human approval gate. [Six playbooks run against a real organization](https://github.com/DustyStudy/aws-remediation-orchestrator/blob/main/docs/PROOF.md), and [one finding traced from detection to evidence](https://github.com/DustyStudy/aws-remediation-orchestrator/blob/main/docs/CASE-STUDY.md).
-- [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker): short-lived IAM Identity Center credentials across many accounts, with no long-lived access keys. [Tested against a real Identity Center instance](https://github.com/DustyStudy/aws-sso-broker/blob/main/docs/PROOF.md).
+- [**aws-org-guardrails**](https://github.com/DustyStudy/aws-org-guardrails): stops privilege escalation, persistence and log tampering across an AWS Organization with SCPs, a permissions boundary, Identity Center permission sets and Bedrock/SageMaker guardrails. [Probed with 62 live probes](https://github.com/DustyStudy/aws-org-guardrails/blob/main/docs/PROOF.md).
+- [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator): responds to Security Hub findings through policy, blast-radius limits and a human approval gate. [Six playbooks run against a real organization](https://github.com/DustyStudy/aws-remediation-orchestrator/blob/main/docs/PROOF.md), and [one finding traced from detection to evidence](https://github.com/DustyStudy/aws-remediation-orchestrator/blob/main/docs/CASE-STUDY.md).
+- [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit): prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation and a tamper-evident audit log for LLM agents. [Fuzzed with 500 attacks against a local Llama 3.1 8B model](https://github.com/DustyStudy/ai-agent-security-toolkit/blob/main/docs/PROOF.md): forbidden tool calls, leaks and exfiltration went from 65 to zero.
 
 ## How the repos fit together
 
@@ -20,10 +30,8 @@ The projects use automated tests (Terraform, Python and Rego), CI security scans
 flowchart LR
   subgraph prevent["Prevent"]
     org["aws-org-guardrails<br/>org SCPs, permissions boundary,<br/>Bedrock and SageMaker guardrails"]
-    lib["fedramp-terraform-library<br/>account baselines and auditors"]
-  end
-  subgraph access["Access"]
-    sso["aws-sso-broker<br/>short-lived Identity Center credentials"]
+    lib["fedramp-terraform-library<br/>hardened baselines and auditors"]
+    sso["aws-sso-broker<br/>short-lived credentials only"]
   end
   subgraph detect["Detect"]
     prowler["prowler-aws-template<br/>org-wide CSPM scans"]
@@ -33,42 +41,32 @@ flowchart LR
   subgraph respond["Respond"]
     rem["aws-remediation-orchestrator<br/>governed auto-remediation"]
   end
-  subgraph prove["Prove"]
+  subgraph prove["Evidence"]
     grc["grc-evidence-automation<br/>tamper-evident control evidence"]
   end
   prevent --> detect --> respond
   sh --> rem
-  prevent --> prove
   respond --> prove
 ```
 
-## Also here
+## More projects
 
-- [**aws-org-guardrails**](https://github.com/DustyStudy/aws-org-guardrails): SCPs, a permissions boundary, Identity Center permission sets and Bedrock/SageMaker guardrails for AWS Organizations, tested as policy behavior. [Probed with 62 live probes](https://github.com/DustyStudy/aws-org-guardrails/blob/main/docs/PROOF.md).
-- [**grc-evidence-automation**](https://github.com/DustyStudy/grc-evidence-automation): scheduled, tamper-evident control evidence for SOC 2, ISO 27001, NIST 800-53 and FedRAMP 20x. [Deployed and verified in a live account](https://github.com/DustyStudy/grc-evidence-automation/blob/main/docs/live-deployment-verification.md).
-- [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit): prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation and a tamper-evident audit log for LLM agents. [Fuzzed with 500 attacks against a local Llama 3.1 8B model](https://github.com/DustyStudy/ai-agent-security-toolkit/blob/main/docs/PROOF.md): forbidden tool calls, leaks and exfiltration went from 65 to zero.
+- [**fedramp-terraform-library**](https://github.com/DustyStudy/fedramp-terraform-library): 23 hardened AWS account baseline modules and read-only auditors, with plan-time tests of the rendered IAM and bucket policies. [Sixteen deployed and probed in a real organization](https://github.com/DustyStudy/fedramp-terraform-library/blob/main/docs/LIVE-PROOF.md). Mapped to NIST 800-53 Rev5 and FedRAMP.
+- [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker): short-lived IAM Identity Center credentials across many accounts, so there are no long-lived access keys to steal. [Tested against a real Identity Center instance](https://github.com/DustyStudy/aws-sso-broker/blob/main/docs/PROOF.md).
 - [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template): org-wide Prowler scans through GitHub Actions and OIDC, with a [documented cost model](https://github.com/DustyStudy/prowler-aws-template/blob/main/docs/COST.md). [Run against a real four-account organization](https://github.com/DustyStudy/prowler-aws-template/blob/main/docs/PROOF.md).
-- [**wiz-cloud-config-rules**](https://github.com/DustyStudy/wiz-cloud-config-rules): custom Wiz Cloud Configuration Rules in Rego, mapped to NIST 800-53 and GovCloud-safe, with 162 `opa test` cases.
+- [**wiz-cloud-config-rules**](https://github.com/DustyStudy/wiz-cloud-config-rules): custom Wiz Cloud Configuration Rules in Rego, GovCloud-safe, with 162 `opa test` cases.
 - [**claude-code-guardrails**](https://github.com/DustyStudy/claude-code-guardrails): guardrails for AI coding agents on AWS and Terraform that block risky commands and catch secrets before they are written.
+- [**grc-evidence-automation**](https://github.com/DustyStudy/grc-evidence-automation): scheduled, tamper-evident control evidence for SOC 2, ISO 27001, NIST 800-53 and FedRAMP 20x. [Deployed and verified in a live account](https://github.com/DustyStudy/grc-evidence-automation/blob/main/docs/live-deployment-verification.md).
 
 ## Engineering notes
 
-[Design decisions and deployment evidence](ENGINEERING.md): why these systems use
-short-lived access, policy-gated remediation and verifiable evidence, with the
-scope and limits of each live run.
-
-## Threat-informed hardening
-
-I connect observed attack techniques to specific controls and regression checks.
-Each entry in the [threat response log](THREAT-RESPONSE.md) names a technique, the control added for it, and any public reporting of attackers using it. The most recent:
-
-- **EC2 termination protection used against responders:** attackers mining with stolen IAM credentials turned on termination protection so their instances couldn't be deleted until someone switched it off, and nothing in the guardrails limited who could change it. An opt-in SCP now denies changing termination or stop protection except to exempt roles, confirmed against live AWS, in [aws-org-guardrails#46](https://github.com/DustyStudy/aws-org-guardrails/pull/46). Reported: [Amazon, 2025](https://aws.amazon.com/blogs/security/cryptomining-campaign-targeting-amazon-ec2-and-amazon-ecs/), a cryptomining campaign on EC2 and ECS.
+[Design decisions and deployment evidence](ENGINEERING.md): how a finding moves through the system, what the live runs establish, and the cost and operating limits of each.
 
 ## Tools and platforms
 
-**Cloud:** AWS (including GovCloud)<br>
-**Infrastructure as code:** Terraform, GitHub Actions<br>
+**Cloud:** AWS, including GovCloud<br>
+**Security:** Security Hub, GuardDuty, AWS Config, IAM Access Analyzer, Prowler, Wiz, OPA/Rego, Checkov, Trivy, Gitleaks, MITRE ATT&CK<br>
+**Infrastructure as code:** Terraform, GitHub Actions (OIDC, no static keys)<br>
 **Languages:** Python, HCL, Rego, PowerShell, Bash<br>
-**Security tooling:** Checkov, Trivy, Gitleaks, Prowler, Wiz, OPA, Security Hub, GuardDuty, AWS Config<br>
-**Frameworks:** FedRAMP Rev5 and 20x, NIST 800-53 Rev5, SOC 2, ISO 27001:2022<br>
+**Compliance:** NIST 800-53 Rev5, FedRAMP Rev5 and 20x, SOC 2, ISO 27001:2022. I map controls to these frameworks; they aren't the goal.<br>
 **AI assistance:** I use AI coding assistants (Claude Code) for drafting and review. I design each system, and I verify it with tests and, where noted, live deployments.
