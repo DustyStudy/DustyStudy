@@ -4,3 +4,7 @@
 remap = [
   'https://github\.com/([^/]+)/([^/]+)/blob/(.+) https://raw.githubusercontent.com/$1/$2/$3',
 ]
+
+# TheHackerWire answers automated clients with 403 on some runs (PR 95), while
+# the page loads in a browser. The threat log cites it, so skip the check.
+exclude = ['^https://www\.thehackerwire\.com/']
