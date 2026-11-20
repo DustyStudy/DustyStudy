@@ -8,7 +8,7 @@ Every control here is tested as policy behavior in CI, and most have been probed
 
 ## Threat-informed hardening
 
-When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 31 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
+When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 39 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
 
 | Technique | What I shipped |
 |---|---|
