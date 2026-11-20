@@ -8,7 +8,7 @@ Every control here is tested as policy behavior in CI, and most have been probed
 
 ## Threat-informed hardening
 
-When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 32 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
+When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 31 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
 
 | Technique | What I shipped |
 |---|---|
@@ -29,7 +29,6 @@ flowchart LR
   subgraph prevent["Prevent"]
     org["aws-org-guardrails<br/>org SCPs, permissions boundary,<br/>Bedrock and SageMaker guardrails"]
     lib["fedramp-terraform-library<br/>hardened baselines and auditors"]
-    sso["aws-sso-broker<br/>short-lived credentials only"]
   end
   subgraph detect["Detect"]
     prowler["prowler-aws-template<br/>org-wide CSPM scans"]
@@ -50,7 +49,6 @@ flowchart LR
 ## More projects
 
 - [**fedramp-terraform-library**](https://github.com/DustyStudy/fedramp-terraform-library): 23 hardened AWS account baseline modules and read-only auditors, with plan-time tests of the rendered IAM and bucket policies. [Sixteen deployed and probed in a real organization](https://github.com/DustyStudy/fedramp-terraform-library/blob/main/docs/LIVE-PROOF.md), where the read-only trust-policy auditor found a GitHub OIDC deploy role that any branch could assume. Mapped to NIST 800-53 Rev5 and FedRAMP.
-- [**aws-sso-broker**](https://github.com/DustyStudy/aws-sso-broker): short-lived IAM Identity Center credentials across many accounts, so there are no long-lived access keys to steal. [Tested against a real Identity Center instance](https://github.com/DustyStudy/aws-sso-broker/blob/main/docs/PROOF.md).
 - [**prowler-aws-template**](https://github.com/DustyStudy/prowler-aws-template): org-wide Prowler scans through GitHub Actions and OIDC, with a [documented cost model](https://github.com/DustyStudy/prowler-aws-template/blob/main/docs/COST.md). [Run against a real four-account organization](https://github.com/DustyStudy/prowler-aws-template/blob/main/docs/PROOF.md).
 - [**wiz-cloud-config-rules**](https://github.com/DustyStudy/wiz-cloud-config-rules): custom Wiz Cloud Configuration Rules in Rego, GovCloud-safe, with 162 `opa test` cases.
 - [**claude-code-guardrails**](https://github.com/DustyStudy/claude-code-guardrails): guardrails for AI coding agents on AWS and Terraform that block risky commands and catch secrets before they are written.
