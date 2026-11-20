@@ -8,13 +8,13 @@ Every control here is tested as policy behavior in CI, and most have been probed
 
 ## Threat-informed hardening
 
-When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 39 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
+When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 40 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
 
 | Technique | What I shipped |
 |---|---|
-| Attackers mining with stolen IAM credentials turn on EC2 termination protection so responders can't delete their instances ([T1078.004](https://attack.mitre.org/techniques/T1078/004/)) | Opt-in SCP that denies changing termination or stop protection except to exempt roles, confirmed against live AWS: [aws-org-guardrails#46](https://github.com/DustyStudy/aws-org-guardrails/pull/46) |
-| A breached vendor's AWS account assumes the roles customers created for it, with the correct External ID, then reads secrets and copies S3 data ([T1199](https://attack.mitre.org/techniques/T1199/), [T1530](https://attack.mitre.org/techniques/T1530/)) | `trust-policy-auditor` flags outside-org trust with no source-IP or VPC-endpoint condition, whole-account trust, and unused vendor roles: [fedramp-terraform-library#69](https://github.com/DustyStudy/fedramp-terraform-library/pull/69) |
-| Privilege escalation through a single IAM action ([T1098.003](https://attack.mitre.org/techniques/T1098/003/)) | Escalation-action check in `identity-center-access-auditor`: [fedramp-terraform-library v1.2.0](https://github.com/DustyStudy/fedramp-terraform-library/releases/tag/v1.2.0) |
+| Valid AWS credentials make many denied calls, then read a production secret ([T1078.004](https://attack.mitre.org/techniques/T1078/004/), [T1555.006](https://attack.mitre.org/techniques/T1555/006/)) | Opt-in detector that flags a principal with a burst of denied calls followed by a successful secret read: [fedramp-terraform-library#93](https://github.com/DustyStudy/fedramp-terraform-library/pull/93) |
+| Prompt injection carried in an MCP tool result steers a coding agent into running commands ([T1059](https://attack.mitre.org/techniques/T1059/)) | The gateway scans every MCP tool result for injection and redacts secrets before it reaches the client: [ai-agent-security-toolkit#119](https://github.com/DustyStudy/ai-agent-security-toolkit/pull/119) |
+| DNS rebinding from a web page reaches a local AI gateway or MCP server ([T1189](https://attack.mitre.org/techniques/T1189/)) | The gateway checks `Origin` and `Host` on both listeners: [ai-agent-security-toolkit#121](https://github.com/DustyStudy/ai-agent-security-toolkit/pull/121) |
 
 ## Start here
 
