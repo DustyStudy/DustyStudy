@@ -8,13 +8,13 @@ Every control here is tested as policy behavior in CI, and most have been probed
 
 ## Threat-informed hardening
 
-When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 40 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
+When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 41 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
 
 | Technique | What I shipped |
 |---|---|
+| Look-alike EMR log bucket created first by an outside account reads cluster logs ([T1565.001](https://attack.mitre.org/techniques/T1565/001/), [T1530](https://attack.mitre.org/techniques/T1530/)) | Opt-in SCP denying access to EMR log buckets owned outside the organization: [aws-org-guardrails#53](https://github.com/DustyStudy/aws-org-guardrails/pull/53) |
 | Valid AWS credentials make many denied calls, then read a production secret ([T1078.004](https://attack.mitre.org/techniques/T1078/004/), [T1555.006](https://attack.mitre.org/techniques/T1555/006/)) | Opt-in detector that flags a principal with a burst of denied calls followed by a successful secret read: [fedramp-terraform-library#93](https://github.com/DustyStudy/fedramp-terraform-library/pull/93) |
 | Prompt injection carried in an MCP tool result steers a coding agent into running commands ([T1059](https://attack.mitre.org/techniques/T1059/)) | The gateway scans every MCP tool result for injection and redacts secrets before it reaches the client: [ai-agent-security-toolkit#119](https://github.com/DustyStudy/ai-agent-security-toolkit/pull/119) |
-| DNS rebinding from a web page reaches a local AI gateway or MCP server ([T1189](https://attack.mitre.org/techniques/T1189/)) | The gateway checks `Origin` and `Host` on both listeners: [ai-agent-security-toolkit#121](https://github.com/DustyStudy/ai-agent-security-toolkit/pull/121) |
 
 ## Start here
 
