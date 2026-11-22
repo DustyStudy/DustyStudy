@@ -4,12 +4,15 @@ How every repo on this account gets the same security settings. This is a
 personal account on GitHub Free, so there are no organization-wide rulesets
 or default security configurations. Instead, three pieces cover new repos:
 
-1. **Start from [`repo-template`](https://github.com/DustyStudy/repo-template)**,
-   which carries CODEOWNERS, SECURITY.md, Dependabot config, a PR template
-   and a thin CI that calls the shared workflows below.
-2. **Run `scripts/repo-baseline.sh <repo>`** once after creating the repo and
-   again after its first CI run. It applies the branch ruleset, Dependabot,
-   secret scanning, push protection, SHA pinning and a read-only token.
+1. **Create every repo with `scripts/new-repo.sh <repo>`** (add `--public`
+   for a public one). It creates the repo from
+   [`repo-template`](https://github.com/DustyStudy/repo-template), which holds
+   Dependabot config and a thin CI that calls the shared workflows below. It
+   then waits for the first CI run and runs step 2. A plain `gh repo create`
+   skips this and leaves the repo with no security CI.
+2. **`scripts/repo-baseline.sh <repo>`** applies the branch ruleset, Dependabot,
+   secret scanning, push protection, SHA pinning and a read-only token. It
+   runs inside `new-repo.sh`; run it by hand after fixing a first CI run that failed.
 3. **The weekly [baseline audit](.github/workflows/baseline-audit.yml)**
    checks every repo and opens one `baseline-drift` issue listing anything
    missed. It only reads; fixing is step 2.
@@ -76,5 +79,5 @@ the region is `us-gov-west-1` or `us-gov-east-1`.
   Pull requests, linear history, resolved threads and passing scans are
   still required.
 - **Nothing applies settings at creation time.** A personal account has no
-  repo-created hook, so the gap between creating a repo and running
-  `repo-baseline.sh` is closed by the weekly audit.
+  repo-created hook, so `new-repo.sh` is the only path that sets a repo up.
+  A repo made by hand is caught by the weekly audit, not prevented.
