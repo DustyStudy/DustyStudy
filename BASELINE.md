@@ -5,8 +5,8 @@ personal account on GitHub Free, so there are no organization-wide rulesets
 or default security configurations. Instead, three pieces cover new repos:
 
 1. **Create every repo with `scripts/new-repo.sh <repo>`** (add `--public`
-   for a public one). It creates the repo from
-   [`repo-template`](https://github.com/DustyStudy/repo-template), which holds
+   for a public one). It creates the repo from the private `repo-template`
+   repo (not linked: the link checker gets a 404 for private repos), which holds
    Dependabot config and a thin CI that calls the shared workflows below. It
    then waits for the first CI run and runs step 2. A plain `gh repo create`
    skips this and leaves the repo with no security CI.
