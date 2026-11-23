@@ -10,12 +10,21 @@ or default security configurations. Instead, three pieces cover new repos:
    Dependabot config and a thin CI that calls the shared workflows below. It
    then waits for the first CI run and runs step 2. A plain `gh repo create`
    skips this and leaves the repo with no security CI.
-2. **`scripts/repo-baseline.sh <repo>`** applies the branch ruleset, Dependabot,
-   secret scanning, push protection, SHA pinning and a read-only token. It
-   runs inside `new-repo.sh`; run it by hand after fixing a first CI run that failed.
+2. **`scripts/repo-baseline.sh <repo>`** applies squash-only merging with
+   branch deletion, wiki off, the branch ruleset (or tightens an existing
+   one), Dependabot, secret scanning with push protection, private
+   vulnerability reporting, CodeQL default setup (public repos), SHA pinning,
+   a read-only token, and approval for outside fork PRs. It runs inside
+   `new-repo.sh`; run it by hand after fixing a first CI run that failed.
 3. **The weekly [baseline audit](.github/workflows/baseline-audit.yml)**
-   checks every repo and opens one `baseline-drift` issue listing anything
-   missed. It only reads; fixing is step 2.
+   checks every repo for the main settings step 2 applies (branch rules,
+   required scan checks, `enforce_admins`, bypass actors, merge style,
+   Dependabot, SHA pinning, read-only token, and on public repos secret
+   scanning, CodeQL, fork PR approval and private vulnerability reporting)
+   and opens one `baseline-drift` issue listing anything missed. It does not
+   check every field step 2 sets. It only reads; fixing is step 2.
+   A repo whose scans have not yet passed on its default branch is flagged
+   for having no required scan checks.
 
 ## Account settings (set once, by hand)
 
@@ -37,6 +46,8 @@ cannot do. Create a
 for **All repositories** with read-only **Actions**, **Administration**,
 **Contents** and **Metadata**, then store it as the `BASELINE_AUDIT_TOKEN`
 secret on this repo. Set an expiry and renew it; the audit fails loudly when it lapses.
+These four match the list in the `scripts/baseline-audit.sh` header; Actions
+is needed to list each repo's workflows.
 
 ## Opting a repo into the shared workflows
 
@@ -77,7 +88,13 @@ the region is `us-gov-west-1` or `us-gov-east-1`.
 - **Required approvals** stay at 0. With one maintainer, requiring an
   approval would block every merge, since nobody can approve their own PR.
   Pull requests, linear history, resolved threads and passing scans are
-  still required.
+  still required, and admins are not exempt from them (classic protection
+  sets `enforce_admins`). A ruleset's bypass actors are left as they are and
+  reported by the audit, not removed.
+- **Scan failures block merges.** The required Trivy check fails on any
+  HIGH or CRITICAL misconfiguration, and on any HIGH or CRITICAL
+  vulnerability that has a fix, so a repo with existing findings stays red
+  until they are fixed or the scan is tuned.
 - **Nothing applies settings at creation time.** A personal account has no
   repo-created hook, so `new-repo.sh` is the only path that sets a repo up.
   A repo made by hand is caught by the weekly audit, not prevented.

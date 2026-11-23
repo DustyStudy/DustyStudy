@@ -120,7 +120,7 @@ jobs:
       - name: Run Trivy filesystem scan
         run: |
           "$RUNNER_TEMP/trivy" fs . --scanners vuln,misconfig --severity HIGH,CRITICAL \
-            --ignore-unfixed --skip-dirs .git --format sarif --output trivy-results.sarif --exit-code 0
+            --ignore-unfixed --skip-dirs .git --format sarif --output trivy-results.sarif --exit-code 1
 
       # Code scanning needs a public repo (or GitHub Advanced Security).
       - name: Upload results to the Security tab

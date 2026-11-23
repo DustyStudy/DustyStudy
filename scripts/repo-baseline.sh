@@ -14,6 +14,17 @@
 # After renaming or removing a CI job, update the required checks before
 # merging the PR that does it, or that PR blocks itself.
 #
+# Branch rules are tightened, never loosened: classic protection gets
+# enforce_admins on, unless it requires approvals (that would block a sole
+# owner's merges; it is then left as is). An existing "Protect main" ruleset
+# gains any missing deletion, force-push, linear-history and pull-request
+# rules, and is set active only if it targets just the default branch. Its
+# bypass actors are kept (baseline-audit.sh reports them).
+# Public repos also get secret scanning (with non-provider patterns), CodeQL
+# default setup (skipped when the repo has its own CodeQL workflow, which
+# default setup conflicts with) and approval for every outside contributor's
+# fork PR runs.
+#
 # Needs gh authenticated as a repo admin, and jq.
 set -euo pipefail
 
@@ -56,6 +67,15 @@ if [ "$private" = false ]; then
     -F 'security_and_analysis[secret_scanning_push_protection][status]=enabled'
   api -X PUT "$R/private-vulnerability-reporting" --silent
   echo "secret scanning, push protection, private vulnerability reporting: on"
+  api -X PATCH "$R" --silent -F 'security_and_analysis[secret_scanning_non_provider_patterns][status]=enabled' ||
+    echo "secret scanning non-provider patterns: not applied" >&2
+  wfs=$(gh api "$R/contents/.github/workflows" --jq '.[].name' 2>/dev/null || true)
+  if grep -qi codeql <<<"$wfs"; then
+    echo "codeql default setup skipped: existing advanced CodeQL workflow" >&2
+  else
+    api -X PATCH "$R/code-scanning/default-setup" -f state=configured --silent ||
+      echo "codeql default setup: not applied (no supported languages or already set)" >&2
+  fi
 fi
 
 # --- Actions: require full-SHA pins and a read-only default token. The
@@ -68,6 +88,11 @@ api -X PUT "$R/actions/permissions" --silent \
 api -X PUT "$R/actions/permissions/workflow" --silent \
   -f default_workflow_permissions=read -F can_approve_pull_request_reviews="$can_approve"
 echo "actions: SHA pinning required, default token read-only"
+# Fork PRs: every outside contributor's workflow run waits for approval.
+if [ "$private" = false ]; then
+  api -X PUT "$R/actions/permissions/fork-pr-contributor-approval" -f approval_policy=all_external_contributors --silent ||
+    echo "fork PR approval: not applied" >&2
+fi
 
 # --- Required checks: the security-scan and sast jobs (shared workflows, the hub's
 # self-call, or a local copy) that last passed on the default branch, plus
@@ -77,6 +102,8 @@ scan_re='^(((Security )?scan|sast) / )?(Secrets [(]Gitleaks[)]|Vulnerabilities a
 checks=$(gh api "$R/commits/$sha/check-runs?per_page=100" --jq \
   "[.check_runs[] | select(.app.slug == \"github-actions\" and .conclusion == \"success\") | .name | select(test(\"$scan_re\"))]")
 checks=$(jq -c -n --argjson a "$checks" '$ARGS.positional + $a | unique' --args "$@")
+[ "$checks" != "[]" ] ||
+  echo "warning: no scan checks have passed on $branch, so none are required; re-run after its first green CI run" >&2
 
 # --- Private repos on GitHub Free can't have rulesets or branch protection.
 # Stop cleanly instead of failing on the 403; everything above still applied.
@@ -86,16 +113,23 @@ if [ "$private" = true ] && ! gh api "$R/rulesets" >/dev/null 2>&1; then
 fi
 
 # --- Branch protection. A repo that already uses classic protection keeps
-# it (its settings and checks stay; the new checks are added). Anything
-# else gets a "Protect main" ruleset. Either way a PR must be up to date
+# it (its settings and checks stay; the new checks are added; admins are
+# no longer exempt unless it requires approvals). Anything else gets a "Protect main" ruleset. Either way a PR must be up to date
 # with the base branch and have its review threads resolved.
 if current=$(gh api "$R/branches/$branch/protection" 2>/dev/null); then
   # PUT replaces the whole rule, so every current setting is carried over.
   # Push restrictions do not exist on a personal account's repos.
-  jq --argjson add "$checks" '{
+  if jq -e '.required_pull_request_reviews | (.required_approving_review_count // 0) > 0
+      or .require_code_owner_reviews == true or .require_last_push_approval == true' <<<"$current" >/dev/null; then
+    ea=$(jq '.enforce_admins.enabled // false' <<<"$current")
+    echo "enforce_admins left as is: required approvals would block the owner's merges; drop the approval count, then re-run" >&2
+  else
+    ea=true
+  fi
+  jq --argjson add "$checks" --argjson ea "$ea" '{
       required_status_checks: {strict: true,
         checks: ([.required_status_checks.checks[]?.context] + $add | unique | map({context: ., app_id: 15368}))},
-      enforce_admins: .enforce_admins.enabled,
+      enforce_admins: $ea,
       required_pull_request_reviews: (.required_pull_request_reviews // null | if . then
         {dismiss_stale_reviews, require_code_owner_reviews, require_last_push_approval, required_approving_review_count}
         else . end),
@@ -112,10 +146,23 @@ if current=$(gh api "$R/branches/$branch/protection" 2>/dev/null); then
 else
   id=$(gh api "$R/rulesets" --jq '.[] | select(.name == "Protect main") | .id')
   if [ -n "$id" ]; then
-    # Keep every existing rule (code scanning, etc.); only merge in the checks.
-    body=$(gh api "$R/rulesets/$id" | jq --argjson add "$checks" '
-      {name, target, enforcement, conditions, bypass_actors, rules} |
-      (.rules[] | select(.type == "pull_request") | .parameters.required_review_thread_resolution) = true |
+    # Keep every existing rule (code scanning, etc.) and the bypass actors;
+    # add the baseline rules it lacks, and merge in the checks. Activate it
+    # only if it targets just the default branch: its rules may have been
+    # written for other branches and left disabled on purpose.
+    rs=$(gh api "$R/rulesets/$id")
+    jq -e '.conditions.ref_name.include == ["~DEFAULT_BRANCH"]' <<<"$rs" >/dev/null ||
+      echo "ruleset 'Protect main' not activated: its conditions don't target only the default branch; fix by hand" >&2
+    body=$(jq --argjson add "$checks" '
+      {name, target, conditions, bypass_actors, rules,
+        enforcement: (if .conditions.ref_name.include == ["~DEFAULT_BRANCH"] then "active" else .enforcement end)} |
+      if any(.rules[]; .type == "pull_request") then
+        (.rules[] | select(.type == "pull_request") | .parameters.required_review_thread_resolution) = true
+      else .rules += [{type: "pull_request", parameters: {
+        required_approving_review_count: 0, dismiss_stale_reviews_on_push: false,
+        require_code_owner_review: false, require_last_push_approval: false,
+        required_review_thread_resolution: true}}] end |
+      .rules += (["deletion", "non_fast_forward", "required_linear_history"] - [.rules[].type] | map({type: .})) |
       if any(.rules[]; .type == "required_status_checks") then
         .rules |= map(if .type == "required_status_checks" then
           .parameters.strict_required_status_checks_policy = true |
@@ -124,7 +171,7 @@ else
       elif ($add | length) > 0 then
         .rules += [{type: "required_status_checks", parameters: {strict_required_status_checks_policy: true,
           required_status_checks: ($add | map({context: ., integration_id: 15368}))}}]
-      else . end')
+      else . end' <<<"$rs")
     api -X PUT "$R/rulesets/$id" --input - --silent <<<"$body"
   else
     body=$(jq -n --argjson names "$checks" '{
