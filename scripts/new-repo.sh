@@ -25,7 +25,7 @@ echo "created $OWNER/$REPO from repo-template"
 run=""
 for _ in $(seq 1 30); do
   run=$(gh run list -R "$OWNER/$REPO" --workflow ci.yml --branch main --limit 1 \
-    --json databaseId --jq '.[0].databaseId // empty')
+    --json databaseId --jq '.[0].databaseId // empty' 2>/dev/null || true) # fails until ci.yml is registered
   [ -n "$run" ] && break
   sleep 10
 done
@@ -33,7 +33,8 @@ if [ -n "$run" ]; then
   gh run watch "$run" -R "$OWNER/$REPO" --exit-status ||
     echo "first CI run failed: baseline still applies, failing scans stay optional" >&2
 else
-  echo "no CI run on main after 5 minutes; check Actions for $OWNER/$REPO" >&2
+  echo "no CI run on main after 5 minutes: applying the baseline without required scan checks." >&2
+  echo "Check Actions for $OWNER/$REPO, then re-run: scripts/repo-baseline.sh $REPO" >&2
 fi
 
 "$HERE/repo-baseline.sh" "$REPO"

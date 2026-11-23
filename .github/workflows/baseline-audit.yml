@@ -6,15 +6,14 @@ name: Repo baseline audit
 # repo's settings; fixing is scripts/repo-baseline.sh, run by hand.
 #
 # Needs the secret BASELINE_AUDIT_TOKEN: a fine-grained PAT scoped to all
-# repos with read-only Administration, Contents and Metadata.
+# repos with read-only Actions, Administration, Contents and Metadata.
 
 on:
   schedule:
     - cron: "0 7 * * 1"
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}
@@ -32,7 +31,11 @@ jobs:
       - name: Harden runner
         uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
-          egress-policy: audit
+          # This job holds the all-repos PAT: only GitHub is reachable.
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
 
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -44,7 +47,7 @@ jobs:
           HAS_TOKEN: ${{ secrets.BASELINE_AUDIT_TOKEN != '' }}
         run: |
           if [ "$HAS_TOKEN" != true ]; then
-            echo "::error::Add a BASELINE_AUDIT_TOKEN secret (fine-grained PAT, read-only Administration/Contents/Metadata on all repos)."
+            echo "::error::Add a BASELINE_AUDIT_TOKEN secret (fine-grained PAT, read-only Actions/Administration/Contents/Metadata on all repos)."
             exit 1
           fi
 
