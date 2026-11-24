@@ -8,13 +8,13 @@ Every control here is tested as policy behavior in CI, and most have been probed
 
 ## Threat-informed hardening
 
-When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 43 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
+When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 44 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
 
 | Technique | What I shipped |
 |---|---|
+| Backups deleted or made unrecoverable before ransomware ([T1490](https://attack.mitre.org/techniques/T1490/)) | Opt-in AWS Backup Vault Lock and deny-delete vault policy, plus an SCP against backup destruction: [fedramp-terraform-library#94](https://github.com/DustyStudy/fedramp-terraform-library/pull/94), [aws-org-guardrails#54](https://github.com/DustyStudy/aws-org-guardrails/pull/54) |
 | Privilege escalation by passing a more privileged role, or trusting every principal ([T1078.004](https://attack.mitre.org/techniques/T1078/004/)) | Auditor reports `iam:PassRole` on all roles and trust policies that allow any principal or an outside account without `sts:ExternalId`: [grc-evidence-automation#48](https://github.com/DustyStudy/grc-evidence-automation/pull/48) |
 | Long-lived cloud keys, broad IAM actions and cloud credentials stored in workflows ([T1552.001](https://attack.mitre.org/techniques/T1552/001/)) | Lint flags long-lived cloud keys, broad IAM actions and stored cloud credentials in workflows: [claude-code-guardrails v0.8.0](https://github.com/DustyStudy/claude-code-guardrails/releases/tag/v0.8.0) |
-| Look-alike EMR log bucket created first by an outside account reads cluster logs ([T1565.001](https://attack.mitre.org/techniques/T1565/001/), [T1530](https://attack.mitre.org/techniques/T1530/)) | Opt-in SCP denying access to EMR log buckets owned outside the organization: [aws-org-guardrails#53](https://github.com/DustyStudy/aws-org-guardrails/pull/53) |
 
 ## Start here
 
