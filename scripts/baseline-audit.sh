@@ -11,7 +11,7 @@
 #
 # Checks: branch rules (PR required, no force-push, enforce_admins on classic
 # protection, no ruleset bypass actors, the Gitleaks, Trivy and zizmor scan
-# checks required), squash-only merging, wiki off,
+# checks required in repos that have workflows), squash-only merging, wiki off,
 # Dependabot alerts and security updates, Actions SHA pinning, read-only
 # default token, fork PR approval, dependabot.yml, workflows not disabled,
 # and on public repos secret scanning, push protection, private
@@ -90,7 +90,8 @@ for name in $repos; do
       --jq '.[] | select(.type == "required_status_checks") | .parameters.required_status_checks[].context')
     req+=$'\n'$(get "" "$R/branches/$branch/protection/required_status_checks" --jq '.checks[].context')
     for c in 'Secrets (Gitleaks)' 'Vulnerabilities and misconfiguration (Trivy)' 'Workflow security (zizmor)'; do
-      grep -qF "$c" <<<"$req" || gaps+=("$c not required")
+      # No workflows, no scan checks to require (e.g. the .github profile repo).
+      [ -z "$wfs" ] || grep -qF "$c" <<<"$req" || gaps+=("$c not required")
     done
     pvr=$(get false "$R/private-vulnerability-reporting" --jq .enabled)
     [ "$pvr" = true ] || gaps+=("private vulnerability reporting off")
