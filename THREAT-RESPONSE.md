@@ -1,6 +1,6 @@
 # Threat-informed hardening log
 
-Changes made to the public repos in response to AWS attack techniques and public threat reporting. Each entry names the technique, links public reporting of attackers using it, and describes what the repo covered before and the control that was added.
+Changes made to the public repos in response to AWS attack techniques and public threat reporting. Each entry names the technique, records the public evidence available, and describes the previous coverage and the control that was added. Some entries draw on incident reports or vulnerability disclosures. Others record where no public report of exploitation was found.
 
 An entry means the repo now has a control for that technique. It does not mean the technique is fully prevented. Each linked PR lists what was tested and what was not.
 
