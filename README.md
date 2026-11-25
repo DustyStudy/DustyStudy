@@ -1,6 +1,6 @@
 # Dustin Arrington
 
-I build AWS defenses against the techniques attackers actually use: stolen and over-trusted credentials, privilege escalation, persistence and resource hijacking. Then I try to break them.
+I build and test AWS defenses for credential misuse, privilege escalation, persistence, and resource hijacking.
 
 I test rendered policies in CI and run selected controls in a four-account AWS organization. The project guides link to test results and deployment evidence.
 
@@ -10,11 +10,11 @@ I test rendered policies in CI and run selected controls in a four-account AWS o
 
 - [**aws-org-guardrails**](https://github.com/DustyStudy/aws-org-guardrails): applies organization-wide policies for IAM, logging, and AI workloads. [See the operations allowed and denied in a live sandbox OU](https://github.com/DustyStudy/aws-org-guardrails/blob/main/docs/PROOF.md).
 - [**aws-remediation-orchestrator**](https://github.com/DustyStudy/aws-remediation-orchestrator): responds to Security Hub findings through policy, blast-radius limits and a human approval gate. [Follow a finding from detection to evidence](https://github.com/DustyStudy/aws-remediation-orchestrator/blob/main/docs/CASE-STUDY.md).
-- [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit): prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation and a tamper-evident audit log for LLM agents. [Llama 3.1 8B evaluation, v0.12.0 release candidate](https://github.com/DustyStudy/ai-agent-security-toolkit#measured-results): attack success fell from 35.5% to 0.4% in this evaluation.
+- [**ai-agent-security-toolkit**](https://github.com/DustyStudy/ai-agent-security-toolkit): prompt-injection fuzzer, tool-call sandbox with taint tracking, output validation and a tamper-evident audit log for LLM agents. [Llama 3.1 8B evaluation, v0.12.0 release candidate](https://github.com/DustyStudy/ai-agent-security-toolkit#measured-results): 177 of 498 cases succeeded against the model alone (35.5%), and 2 of 497 succeeded with the toolkit enabled (0.4%).
 
 ## Threat-informed hardening
 
-When a new AWS attack technique shows up in incident reports, I trace it to a control, ship the control, and add a regression check. The [threat response log](THREAT-RESPONSE.md) has 44 entries since September 2026, each tagged with MITRE ATT&CK techniques and linked to public reporting. A few:
+The [threat response log](THREAT-RESPONSE.md) maps AWS attack techniques to controls I added and the tests I ran. Each entry identifies the public evidence available, such as an incident report or a vulnerability disclosure, and notes where evidence is missing. A few examples:
 
 | Technique | What I shipped |
 |---|---|
