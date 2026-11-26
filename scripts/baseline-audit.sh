@@ -102,8 +102,26 @@ for name in $repos; do
     [ "$fork" = all_external_contributors ] || gaps+=("fork PR approval below all_external_contributors")
   fi
 
-  jq -e '.allow_squash_merge == true and .allow_merge_commit == false and .allow_rebase_merge == false' \
-    <<<"$meta" >/dev/null || gaps+=("merge settings not squash-only")
+  # REST can omit merge settings for the read-only audit token.
+  merge_methods=$(jq -r '
+    [.allow_squash_merge, .allow_merge_commit, .allow_rebase_merge]
+    | if all(.[]; type == "boolean") then @csv else empty end
+  ' <<<"$meta")
+  if [ -z "$merge_methods" ]; then
+    merge_methods=$(get unknown graphql \
+      -f 'query=query($owner: String!, $name: String!) {
+        repository(owner: $owner, name: $name) {
+          squashMergeAllowed mergeCommitAllowed rebaseMergeAllowed
+        }
+      }' -f owner="$OWNER" -f name="$name" \
+      --jq '.data.repository | [.squashMergeAllowed, .mergeCommitAllowed, .rebaseMergeAllowed]
+        | if all(.[]; type == "boolean") then @csv else "unknown" end')
+  fi
+  case "$merge_methods" in
+    true,false,false) ;;
+    unknown) gaps+=("merge settings could not be verified") ;;
+    *) gaps+=("merge settings not squash-only") ;;
+  esac
 
   [ "$(jq -r .has_wiki <<<"$meta")" = false ] || gaps+=("wiki on")
 
